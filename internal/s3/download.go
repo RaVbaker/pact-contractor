@@ -16,7 +16,7 @@ func Download(bucket, region, path string) (err error) {
 	af := afero.Afero{Fs: fs}
 	var file afero.File
 	for _, path := range paths {
-		filename := pathToFilename(path)
+		filename := pathToFilename(path, defaultSpecName)
 		err = af.MkdirAll(filepath.Dir(filename), 0755)
 		if err != nil {
 			return fmt.Errorf("failed to create dir structure %q, %v", filepath.Dir(filename), err)
@@ -31,8 +31,10 @@ func Download(bucket, region, path string) (err error) {
 	return
 }
 
-func pathToFilename(path string) string {
-	return path
+func pathToFilename(path, spec string) string {
+	dir, filename := filepath.Split(path)
+	ext := filepath.Ext(filename)
+	return filepath.Join(dir, spec+ext)
 }
 
 func download(bucket, region, path, filename string, file afero.File) {

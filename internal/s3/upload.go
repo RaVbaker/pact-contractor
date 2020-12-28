@@ -3,6 +3,7 @@ package s3
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -10,7 +11,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-func Upload(bucket, region, filesPath string) (err error) {
+func Upload(bucket, region, specTag, filesPath string) (err error) {
 	var files []string
 	var file afero.File
 	files, err = afero.Glob(fs, filesPath)
@@ -19,14 +20,16 @@ func Upload(bucket, region, filesPath string) (err error) {
 		if err != nil {
 			return
 		}
-		path := filenameToPath(filename)
+		path := filenameToPath(filename, specTag)
 		upload(bucket, region, path, file)
 	}
 	return
 }
 
-func filenameToPath(filename string) string {
-	return filename
+func filenameToPath(filename, tag string) string {
+	dir, file := filepath.Split(filename)
+	ext := filepath.Ext(file)
+	return filepath.Join(dir, tag+ext)
 }
 
 func upload(bucket, region, path string, file afero.File) {

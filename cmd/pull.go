@@ -34,7 +34,9 @@ var pullCmd = &cobra.Command{
 	Short: "Pulls pact contracts from configured S3 bucket",
 	Long: `Pulls pact contracts from the bucket by the key/path.
 
-In first version it fetches it to same directory/folder structure where it was stored.`,
+It fetches it to same directory/folder structure where it was stored with "spec.json" filename at the end.
+E.g. 'pull pacts/foo/bar/main.json' command will store a file 'pacts/foo/bar/spec.json'.
+`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		path := args[0]

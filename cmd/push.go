@@ -30,7 +30,9 @@ import (
 	"github.com/ravbaker/pact-contractor/internal/s3"
 )
 
-const defaultFilesPath = "pacts/provider/*/consumer/*/*.json"
+const defaultFilesPath = "pacts/*/*/spec.json"
+
+var specTag string
 
 // pushCmd represents the push command
 var pushCmd = &cobra.Command{
@@ -38,12 +40,12 @@ var pushCmd = &cobra.Command{
 	Short: "Push generated pact contracts to configured S3 bucket, (default path=\""+defaultFilesPath+"\")",
 	Long: `Push generated pact contracts, based on path to configured S3 bucket
 
-Default path="`+defaultFilesPath+`", but can be configured until it's in Glob format'`,
+Default path="`+defaultFilesPath+`", but can be configured until it's in Glob format and ends with "spec.json"`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
 			args = append(args, defaultFilesPath)
 		}
-		err:= s3.Upload(viper.GetString("bucket"), viper.GetString("region"), args[0])
+		err:= s3.Upload(viper.GetString("bucket"), viper.GetString("region"), specTag, args[0])
 		if err != nil {
 			panic(fmt.Sprintf("%v", err))
 		}
@@ -58,8 +60,6 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// pushCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// pushCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	
+	pushCmd.Flags().StringVarP(&specTag, "tag", "t", s3.DefaultSpecTag, "Provides the tag under which the specification is stored")
 }
