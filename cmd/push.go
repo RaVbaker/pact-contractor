@@ -27,6 +27,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	
+	"github.com/ravbaker/pact-contractor/internal/speccontext"
 	"github.com/ravbaker/pact-contractor/internal/s3"
 )
 
@@ -45,7 +46,8 @@ Default path="`+defaultFilesPath+`", but can be configured until it's in Glob fo
 		if len(args) < 1 {
 			args = append(args, defaultFilesPath)
 		}
-		err:= s3.Upload(viper.GetString("bucket"), viper.GetString("region"), specTag, args[0])
+		ctx := speccontext.NewGitContext(specTag)
+		err:= s3.Upload(viper.GetString("bucket"), viper.GetString("region"), args[0], ctx)
 		if err != nil {
 			panic(fmt.Sprintf("%v", err))
 		}
