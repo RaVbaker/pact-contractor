@@ -20,19 +20,33 @@ type GitContext struct {
 
 
 func NewGitContext(specTag string) GitContext {
-	branch, commitSHA := retrieveGitContextDetails()
-	
-	return GitContext{Context: Context{SpecTag: specTag}, CommitSHA: commitSHA, Branch: branch}
+	gitContext := lookupGitContext()
+	gitContext.Context = Context{SpecTag: specTag}
+	return gitContext
 }
 
-func retrieveGitContextDetails() (string, string) {
+func lookupGitContext() GitContext {
 	r, err := git.PlainOpen("../.git")
 	if err != nil {
 		panic(err.Error())
 	}
 	
-	rev, _ := r.Head()
-	branch := strings.Replace(rev.Name().String(), "refs/heads/", "", 1)
-	commitSHA := rev.Hash()
-	return branch, commitSHA.String()
+	ref, _ := r.Head()
+	commit, _ := r.CommitObject(ref.Hash())
+	
+	branchName := extractBranchName(ref.Name().String())
+	return GitContext{Branch: branchName, CommitSHA: commit.Hash.String(), Author: commit.Author.Name}
+}
+
+const (
+	legacyMasterName = "master"
+	defaultBranch = "main"
+)
+
+func extractBranchName(refName string) (branch string) {
+	branch = strings.Replace(refName, "refs/heads/", "", 1)
+	if branch == legacyMasterName {
+		branch = defaultBranch
+	}
+	return
 }
