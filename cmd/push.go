@@ -63,5 +63,5 @@ func init() {
 	// and all subcommands, e.g.:
 	// pushCmd.PersistentFlags().String("foo", "", "A help for foo")
 	
-	pushCmd.Flags().StringVarP(&specTag, "tag", "t", s3.DefaultSpecTag, "Provides the tag under which the specification is stored")
+	pushCmd.Flags().StringVarP(&specTag, "tag", "t", speccontext.BranchSpecTag, "Provides the tag under which the specification is stored, if 'branch' uses Git current branch name")
 }

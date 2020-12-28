@@ -21,6 +21,9 @@ type GitContext struct {
 
 func NewGitContext(specTag string) GitContext {
 	gitContext := lookupGitContext()
+	if specTag == BranchSpecTag && len(gitContext.Branch) != 0 {
+		specTag = gitContext.Branch
+	}
 	gitContext.Context = Context{SpecTag: specTag}
 	return gitContext
 }
@@ -41,6 +44,7 @@ func lookupGitContext() GitContext {
 const (
 	legacyMasterName = "master"
 	defaultBranch = "main"
+	BranchSpecTag = "branch"
 )
 
 func extractBranchName(refName string) (branch string) {
