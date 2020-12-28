@@ -32,12 +32,9 @@ import (
 var pullCmd = &cobra.Command{
 	Use:   "pull [path]",
 	Short: "Pulls pact contracts from configured S3 bucket",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Long: `Pulls pact contracts from the bucket by the key/path.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+In first version it fetches it to same directory/folder structure where it was stored.`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		path := args[0]
