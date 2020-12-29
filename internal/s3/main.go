@@ -8,7 +8,6 @@ import (
 )
 
 const (
-	DefaultSpecTag  = "main"
 	defaultSpecName = "spec" // must match defaultFilesPath
 )
 

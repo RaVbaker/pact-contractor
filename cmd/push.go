@@ -33,7 +33,7 @@ import (
 
 const defaultFilesPath = "pacts/*/*/spec.json"
 
-var specTag string
+var specTag, gitAuthor, gitBranch, gitCommitSHA string
 
 // pushCmd represents the push command
 var pushCmd = &cobra.Command{
@@ -46,7 +46,7 @@ Default path="`+defaultFilesPath+`", but can be configured until it's in Glob fo
 		if len(args) < 1 {
 			args = append(args, defaultFilesPath)
 		}
-		ctx := speccontext.NewGitContext(specTag)
+		ctx := speccontext.NewGitContext(specTag, gitAuthor, gitBranch, gitCommitSHA)
 		err:= s3.Upload(viper.GetString("bucket"), viper.GetString("region"), args[0], ctx)
 		if err != nil {
 			panic(fmt.Sprintf("%v", err))
@@ -64,4 +64,7 @@ func init() {
 	// pushCmd.PersistentFlags().String("foo", "", "A help for foo")
 	
 	pushCmd.Flags().StringVarP(&specTag, "tag", "t", speccontext.BranchSpecTag, "Provides the tag under which the specification is stored, if 'branch' uses Git current branch name")
+	pushCmd.Flags().StringVar(&gitAuthor, "git-author",  "", "Provides the git commit author name")
+	pushCmd.Flags().StringVar(&gitBranch, "git-branch", "", "Provides the git current branch")
+	pushCmd.Flags().StringVar(&gitCommitSHA, "git-commit-sha", "", "Provides the git commit SHA reference, if provided can be an origin of author/branch name")
 }
