@@ -1,11 +1,13 @@
 package speccontext
 
 import (
-	"strings"
+	"fmt"
+	"log"
 	
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/spf13/afero"
 )
 
 type Context struct {
@@ -23,6 +25,7 @@ type GitContext struct {
 
 func NewGitContext(specTag, author, branch, commitSHA string) GitContext {
 	gitContext := extractGitContext(commitSHA)
+	
 	// overwrite extracted values
 	if len(author) != 0 {
 		gitContext.Author = author
@@ -47,32 +50,64 @@ func NewContext(specTag string) Context {
 }
 
 func extractGitContext(commitSHA string) GitContext {
-	commit, branchName := fetchGitDetails(commitSHA)
+	if ok, err := afero.DirExists(fs, gitPath); !ok || err != nil {
+		log.Printf("No GIT repository found under %s", gitPath)
+		return GitContext{}
+	}
+	
+	commit, branchName := fetchGitDetails(gitPath, commitSHA)
+	if commit == nil {
+		log.Printf("No commits found for HEAD/%s under %s", commitSHA, gitPath)
+		return GitContext{}
+	}
 	return GitContext{Branch: branchName, CommitSHA: commit.Hash.String(), Author: commit.Author.Name}
 }
 
-func fetchGitDetails(commitSHA string) (*object.Commit, string) {
+func fetchGitDetails(gitPath, commitSHA string) (*object.Commit, string) {
 	r, err := git.PlainOpen(gitPath)
 	if err != nil {
-		panic(err.Error())
+		log.Printf("Git repository open error: %v", err)
+		return nil, ""
 	}
 	
 	var ref *plumbing.Reference
 	if len(commitSHA) == 0 {
 		ref, err = r.Head()
 	} else {
-		ref, err = r.Reference(plumbing.ReferenceName(commitSHA), true)
+		ref, err = findReferenceFromCommitSHA(r, commitSHA)
 	}
 	if err != nil {
-		panic(err.Error())
-	}
-	commit, err := r.CommitObject(ref.Hash())
-	if err != nil {
-		panic(err.Error())
+		log.Printf("Git reference resolve[%s] error: %v", commitSHA, err)
+		return nil, ""
 	}
 	
-	branchName := extractBranchName(ref.Name().String())
+	commit, err := r.CommitObject(ref.Hash())
+	if err != nil {
+		log.Printf("Git commit[%v] open error: %v", ref.Hash(), err)
+		return nil, ""
+	}
+	
+	branchName := normalizeBranchName(ref.Name().Short())
 	return commit, branchName
+}
+
+func findReferenceFromCommitSHA(r *git.Repository, commitSHA string) (*plumbing.Reference, error) {
+	hash, err := r.ResolveRevision(plumbing.Revision(commitSHA))
+	if err != nil {
+		return nil, err
+	}
+	
+	refs, _ := r.References()
+	var ref *plumbing.Reference
+	err = refs.ForEach(func(iterRef *plumbing.Reference) error {
+		if iterRef.Hash() == *hash {
+			ref = iterRef
+			refs.Close()
+			return nil
+		}
+		return fmt.Errorf("reference %s not found when iterating", commitSHA)
+	})
+	return ref, err
 }
 
 const (
@@ -83,10 +118,15 @@ const (
     gitPath = "./.git"
 )
 
-func extractBranchName(refName string) (branch string) {
-	branch = strings.Replace(refName, "refs/heads/", "", 1)
+func normalizeBranchName(branch string) string {
 	if branch == legacyMasterName {
 		branch = defaultBranch
 	}
-	return
+	return branch
+}
+
+var fs afero.Fs
+
+func init() {
+	fs = afero.NewOsFs()
 }
