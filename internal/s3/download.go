@@ -2,17 +2,21 @@ package s3
 
 import (
 	"fmt"
+	"log"
 	"path/filepath"
+	"strings"
 	
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/spf13/afero"
+	
+	"github.com/ravbaker/pact-contractor/internal/speccontext"
 )
 
-func Download(bucket, region, path string) (err error) {
-	paths := []string{ path }
+func Download(bucket, region, path, gitBranch string, gitFlow bool) (err error) {
+	paths := resolvePath(path, gitBranch, gitFlow)
 	af := afero.Afero{Fs: fs}
 	var file afero.File
 	for _, path := range paths {
@@ -26,8 +30,35 @@ func Download(bucket, region, path string) (err error) {
 		if err != nil {
 			return fmt.Errorf("failed to create file %q, %v", filename, err)
 		}
-		download(bucket, region, path, filename, file)
+		ok := download(bucket, region, path, filename, file)
+		if ok {
+			break
+		}
 	}
+	return
+}
+
+func resolvePath(path, gitBranch string, gitFlow bool) (paths []string) {
+	if strings.Contains(path, speccontext.BranchSpecTag) {
+		pattern := strings.Replace(path, speccontext.BranchSpecTag, "%s", -1)
+		paths = gitBranchPaths(pattern, gitBranch, gitFlow)
+	} else {
+		paths = append(paths, path)
+	}
+	return
+}
+
+func gitBranchPaths(pattern, branchName string, gitFlow bool) (paths []string) {
+	if branchName == "" {
+		branchName = speccontext.CurrentBranchName()
+	}
+	if branchName != "" {
+		paths = append(paths, fmt.Sprintf(pattern, branchName))
+	}
+	if gitFlow {
+		paths = append(paths, fmt.Sprintf(pattern, speccontext.GitFlowDevelopBranch))
+	}
+	paths = append(paths, fmt.Sprintf(pattern, speccontext.DefaultSpecTag))
 	return
 }
 
@@ -37,7 +68,7 @@ func pathToFilename(path, spec string) string {
 	return filepath.Join(dir, spec+ext)
 }
 
-func download(bucket, region, path, filename string, file afero.File) {
+func download(bucket, region, path, filename string, file afero.File) bool {
 	// Initialize a session in us-west-2 that the SDK will use to load
 	// credentials from the shared credentials file ~/.aws/credentials.
 	sess, err := session.NewSession(&aws.Config{
@@ -56,7 +87,9 @@ func download(bucket, region, path, filename string, file afero.File) {
 		Key:    aws.String(path),
 	})
 	if err != nil {
-		panic(fmt.Errorf("failed to download file, %v", err))
+		log.Printf("failed to download file, %v", err)
+		return false
 	}
-	fmt.Printf("file downloaded, %d bytes\n", n)
+	fmt.Printf("Successfully downloaded %q from bucket %q to file %q, %d bytes\n", path, bucket, filename, n)
+	return true
 }

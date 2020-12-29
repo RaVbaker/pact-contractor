@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	defaultBranch = "main"
-	legacyMasterName = "master"
-	gitPath = "./.git"
+	GitFlowDevelopBranch  = "develop"
+	legacyMasterName      = "master"
+	gitPath               = "./.git"
 )
 
 
@@ -45,6 +45,11 @@ func NewGitContext(specTag, author, branch, commitSHA string) GitContext {
 	
 	gitContext.Context = NewContext(specTag)
 	return gitContext
+}
+
+func CurrentBranchName() string {
+	gitContext := extractGitContext("")
+	return gitContext.Branch
 }
 
 
@@ -110,7 +115,7 @@ func findReferenceFromCommitSHA(r *git.Repository, commitSHA string) (*plumbing.
 
 func normalizeBranchName(branch string) string {
 	if branch == legacyMasterName {
-		branch = defaultBranch
+		branch = DefaultSpecTag
 	}
 	return branch
 }

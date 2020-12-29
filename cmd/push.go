@@ -65,6 +65,6 @@ func init() {
 	
 	pushCmd.Flags().StringVarP(&specTag, "tag", "t", speccontext.BranchSpecTag, "Provides the tag under which the specification is stored, if '"+speccontext.BranchSpecTag+"' uses Git current branch name")
 	pushCmd.Flags().StringVar(&gitAuthor, "git-author",  "", "Provides the git commit author name")
-	pushCmd.Flags().StringVar(&gitBranch, "git-branch", "", "Provides the git current branch")
+	pushCmd.Flags().StringVar(&gitBranch, "git-branch", "", "Provides the git current branch name")
 	pushCmd.Flags().StringVar(&gitCommitSHA, "git-commit-sha", "", "Provides the git commit SHA reference, if provided can be an origin of author/branch name")
 }
