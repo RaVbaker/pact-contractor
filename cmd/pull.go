@@ -35,7 +35,7 @@ var pullCmd = &cobra.Command{
 	Long: `Pulls pact contracts from the bucket by the key/path.
 
 It fetches it to same directory/folder structure where it was stored with "spec.json" filename at the end
-or ending with "{branch}.json" at the end to perform dynamic branch matching with GitHub Flow.
+or ending with "{branch}.json" at the end to perform dynamic branch matching with GitHub Flow (feature-branch,main).
 E.g. 'pull pacts/foo/bar/{branch}.json' command will store a file 'pacts/foo/bar/spec.json'.
 `,
 	Args: cobra.MinimumNArgs(1),
@@ -62,6 +62,6 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	pullCmd.Flags().StringVar(&gitBranchName, "git-branch", "", "Provides the git current branch name")
-	pullCmd.Flags().BoolVar(&gitFlow, "gitflow", false, "Implies the Git Flow on matching branch detection(feature-branch,develop,main), remember that with {branch} substitution the default is GitHub Flow(feature-branch,main)")
+	pullCmd.Flags().StringVar(&gitBranchName, "git-branch", "", "Overwrites git detected current branch name")
+	pullCmd.Flags().BoolVar(&gitFlow, "gitflow", false, "Implies the Git Flow on matching branch detection(feature-branch,develop,main), if not enabled it uses GitHub Flow(feature-branch,main)")
 }
