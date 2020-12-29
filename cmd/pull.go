@@ -41,7 +41,7 @@ E.g. 'pull pacts/foo/bar/{branch}.json' command will store a file 'pacts/foo/bar
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		path := args[0]
-		err := s3.Download(viper.GetString("bucket"), viper.GetString("region"), path, gitBranchName, gitFlow)
+		err := s3.Download(viper.GetString("bucket"), viper.GetString("region"), path, s3VersionID, gitBranchName, gitFlow)
 		if err != nil {
 			panic(err)
 		}
@@ -49,7 +49,7 @@ E.g. 'pull pacts/foo/bar/{branch}.json' command will store a file 'pacts/foo/bar
 }
 
 var gitFlow bool
-var gitBranchName string
+var gitBranchName, s3VersionID string
 
 func init() {
 	rootCmd.AddCommand(pullCmd)
@@ -62,6 +62,7 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
+	pullCmd.Flags().StringVar(&s3VersionID, "version", "", "Provides AWS S3 Object VersionID for download")
 	pullCmd.Flags().StringVar(&gitBranchName, "git-branch", "", "Overwrites git detected current branch name")
 	pullCmd.Flags().BoolVar(&gitFlow, "gitflow", false, "Implies the Git Flow on matching branch detection(feature-branch,develop,main), if not enabled it uses GitHub Flow(feature-branch,main)")
 }

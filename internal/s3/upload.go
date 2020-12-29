@@ -86,6 +86,6 @@ func upload(client s3iface.S3API, bucket, path string, file afero.File, metadata
 	}
 	
 	
-	fmt.Printf("Successfully uploaded %q [version: %s] to %q\n", path, *uploadedObject.VersionID, bucket)
+	fmt.Printf("Successfully uploaded %q [version: %q] to %q\n", path, *uploadedObject.VersionID, bucket)
 	return uploadedObject.VersionID
 }

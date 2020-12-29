@@ -15,7 +15,7 @@ import (
 	"github.com/ravbaker/pact-contractor/internal/speccontext"
 )
 
-func Download(bucket, region, path, gitBranch string, gitFlow bool) (err error) {
+func Download(bucket, region, path, s3VersionID, gitBranch string, gitFlow bool) (err error) {
 	paths := resolvePath(path, gitBranch, gitFlow)
 	af := afero.Afero{Fs: fs}
 	var file afero.File
@@ -30,7 +30,7 @@ func Download(bucket, region, path, gitBranch string, gitFlow bool) (err error) 
 		if err != nil {
 			return fmt.Errorf("failed to create file %q, %v", filename, err)
 		}
-		ok := download(bucket, region, path, filename, file)
+		ok := download(bucket, region, path, s3VersionID, filename, file)
 		if ok {
 			break
 		}
@@ -68,7 +68,7 @@ func pathToFilename(path, spec string) string {
 	return filepath.Join(dir, spec+ext)
 }
 
-func download(bucket, region, path, filename string, file afero.File) bool {
+func download(bucket, region, path, s3VersionID, filename string, file afero.File) bool {
 	// Initialize a session in us-west-2 that the SDK will use to load
 	// credentials from the shared credentials file ~/.aws/credentials.
 	sess, err := session.NewSession(&aws.Config{
@@ -85,11 +85,22 @@ func download(bucket, region, path, filename string, file afero.File) bool {
 	n, err := downloader.Download(file, &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(path),
+		VersionId: optionalAWSString(s3VersionID),
 	})
 	if err != nil {
 		log.Printf("failed to download file, %v", err)
 		return false
 	}
-	fmt.Printf("Successfully downloaded %q from bucket %q to file %q, %d bytes\n", path, bucket, filename, n)
+	if len(s3VersionID) != 0 {
+		s3VersionID = fmt.Sprintf(" [version: %q]", s3VersionID)
+	}
+	fmt.Printf("Successfully downloaded %q%s from bucket %q to file %q, %d bytes\n", path, s3VersionID, bucket, filename, n)
 	return true
+}
+
+func optionalAWSString(s string) *string {
+	if len(s) == 0 {
+		return nil
+	}
+	return aws.String(s)
 }
