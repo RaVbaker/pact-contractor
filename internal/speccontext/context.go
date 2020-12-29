@@ -1,13 +1,12 @@
 package speccontext
 
 import (
-	"fmt"
-	"log"
-	
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/spf13/afero"
+)
+
+const (
+	BranchSpecTag = "{branch}"
+	DefaultSpecTag  = "main"
 )
 
 type Context struct {
@@ -15,114 +14,8 @@ type Context struct {
 	VerificationStatus bool
 }
 
-type GitContext struct {
-	Context
-	Author string
-	CommitSHA string
-	Branch string
-}
-
-
-func NewGitContext(specTag, author, branch, commitSHA string) GitContext {
-	gitContext := extractGitContext(commitSHA)
-	
-	// overwrite extracted values
-	if len(author) != 0 {
-		gitContext.Author = author
-	}
-	if len(branch) != 0 {
-		gitContext.Branch = branch
-	}
-	if specTag == BranchSpecTag {
-		if len(gitContext.Branch) != 0 {
-			specTag = gitContext.Branch
-		} else {
-			specTag = DefaultSpecTag
-		}
-	}
-	
-	gitContext.Context = NewContext(specTag)
-	return gitContext
-}
-
 func NewContext(specTag string) Context {
 	return Context{SpecTag: specTag}
-}
-
-func extractGitContext(commitSHA string) GitContext {
-	if ok, err := afero.DirExists(fs, gitPath); !ok || err != nil {
-		log.Printf("No GIT repository found under %s", gitPath)
-		return GitContext{}
-	}
-	
-	commit, branchName := fetchGitDetails(gitPath, commitSHA)
-	if commit == nil {
-		log.Printf("No commits found for HEAD/%s under %s", commitSHA, gitPath)
-		return GitContext{}
-	}
-	return GitContext{Branch: branchName, CommitSHA: commit.Hash.String(), Author: commit.Author.Name}
-}
-
-func fetchGitDetails(gitPath, commitSHA string) (*object.Commit, string) {
-	r, err := git.PlainOpen(gitPath)
-	if err != nil {
-		log.Printf("Git repository open error: %v", err)
-		return nil, ""
-	}
-	
-	var ref *plumbing.Reference
-	if len(commitSHA) == 0 {
-		ref, err = r.Head()
-	} else {
-		ref, err = findReferenceFromCommitSHA(r, commitSHA)
-	}
-	if err != nil {
-		log.Printf("Git reference resolve[%s] error: %v", commitSHA, err)
-		return nil, ""
-	}
-	
-	commit, err := r.CommitObject(ref.Hash())
-	if err != nil {
-		log.Printf("Git commit[%v] open error: %v", ref.Hash(), err)
-		return nil, ""
-	}
-	
-	branchName := normalizeBranchName(ref.Name().Short())
-	return commit, branchName
-}
-
-func findReferenceFromCommitSHA(r *git.Repository, commitSHA string) (*plumbing.Reference, error) {
-	hash, err := r.ResolveRevision(plumbing.Revision(commitSHA))
-	if err != nil {
-		return nil, err
-	}
-	
-	refs, _ := r.References()
-	var ref *plumbing.Reference
-	err = refs.ForEach(func(iterRef *plumbing.Reference) error {
-		if iterRef.Hash() == *hash {
-			ref = iterRef
-			refs.Close()
-			return nil
-		}
-		return fmt.Errorf("reference %s not found when iterating", commitSHA)
-	})
-	return ref, err
-}
-
-const (
-	legacyMasterName = "master"
-	defaultBranch = "main"
-	BranchSpecTag = "{branch}"
-	DefaultSpecTag  = "main"
-    gitPath = "./.git"
-)
-
-func normalizeBranchName(branch string) string {
-	if branch == legacyMasterName {
-		branch = defaultBranch
-	}
-	return branch
 }
 
 var fs afero.Fs
