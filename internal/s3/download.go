@@ -15,7 +15,28 @@ import (
 	"github.com/ravbaker/pact-contractor/internal/speccontext"
 )
 
-func Download(bucket, region, path, s3VersionID, gitBranch string, gitFlow bool) (err error) {
+func Download(bucket, region, paths, s3VersionID, gitBranch string, gitFlow bool) (err error) {
+	list := extractPaths(paths, s3VersionID)
+	for path, version := range list {
+		err = downloadPath(bucket, region, path, version, gitBranch, gitFlow)
+		if err != nil {
+			log.Printf("Download of \"%s#%s\" error %v", path, version, err)
+		}
+	}
+	return
+}
+
+func extractPaths(paths string, versionID string) (out map[string]string) {
+	out = make(map[string]string)
+	pathList := strings.Split(paths, ",")
+	for _, pathWithVersion := range pathList {
+		splitPath := strings.SplitN(pathWithVersion+"#"+versionID, "#", 3)
+		out[splitPath[0]] = splitPath[1]
+	}
+	return
+}
+
+func downloadPath(bucket string, region string, path string, s3VersionID string, gitBranch string, gitFlow bool) (err error) {
 	paths := resolvePath(path, gitBranch, gitFlow)
 	af := afero.Afero{Fs: fs}
 	var file afero.File

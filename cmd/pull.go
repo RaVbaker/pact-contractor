@@ -30,18 +30,22 @@ import (
 
 // pullCmd represents the pull command
 var pullCmd = &cobra.Command{
-	Use:   "pull [path]",
+	Use:   "pull [paths]",
 	Short: "Pulls pact contracts from configured S3 bucket",
-	Long: `Pulls pact contracts from the bucket by the key/path.
+	Long: `Pulls pact contracts from the bucket by the path.
 
 It fetches it to same directory/folder structure where it was stored with "spec.json" filename at the end
 or ending with "{branch}.json" at the end to perform dynamic branch matching with GitHub Flow (feature-branch,main).
 E.g. 'pull pacts/foo/bar/{branch}.json' command will store a file 'pacts/foo/bar/spec.json'.
+
+The paths can be a list of paths separated by comma and with optional version definition after # sign. Like:
+"paths/foo/bar/test.json#some-v3rsion-1D,paths/foo/baz/{branch}.json#oth3r-v3rsion-1D"
+When paths are resolved with same values last definition is downloaded.
 `,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		path := args[0]
-		err := s3.Download(viper.GetString("bucket"), viper.GetString("region"), path, s3VersionID, gitBranchName, gitFlow)
+		paths := args[0]
+		err := s3.Download(viper.GetString("bucket"), viper.GetString("region"), paths, s3VersionID, gitBranchName, gitFlow)
 		if err != nil {
 			panic(err)
 		}
