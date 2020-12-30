@@ -7,11 +7,6 @@ import (
 	"github.com/spf13/afero"
 )
 
-const (
-	defaultSpecName = "spec" // must match defaultFilesPath
-)
-
-
 var fs afero.Fs
 
 func init() {
@@ -28,4 +23,11 @@ func newClient(region string) *s3.S3 {
 	
 	svc := s3.New(sess)
 	return svc
+}
+
+func optionalAWSString(s string) *string {
+	if len(s) == 0 {
+		return nil
+	}
+	return aws.String(s)
 }

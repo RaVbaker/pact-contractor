@@ -27,6 +27,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	
+	"github.com/ravbaker/pact-contractor/internal/parts"
 	"github.com/ravbaker/pact-contractor/internal/speccontext"
 	"github.com/ravbaker/pact-contractor/internal/s3"
 )
@@ -34,8 +35,8 @@ import (
 const defaultFilesPath = "pacts/*/*/spec.json"
 
 var specTag, gitAuthor, gitBranch, gitCommitSHA string
+var part, numOfParts int
 
-// pushCmd represents the push command
 var pushCmd = &cobra.Command{
 	Use:   "push [path]",
 	Short: "Push generated pact contracts to configured S3 bucket, (default path=\""+defaultFilesPath+"\")",
@@ -46,8 +47,9 @@ Default path="`+defaultFilesPath+`", but can be configured until it's in Glob fo
 		if len(args) < 1 {
 			args = append(args, defaultFilesPath)
 		}
+		partsScope := parts.NewScope(part, numOfParts)
 		ctx := speccontext.NewGitContext(specTag, gitAuthor, gitBranch, gitCommitSHA)
-		err:= s3.Upload(viper.GetString("bucket"), viper.GetString("region"), args[0], ctx)
+		err:= s3.Upload(viper.GetString("bucket"), viper.GetString("region"), args[0], partsScope, ctx)
 		if err != nil {
 			panic(fmt.Sprintf("%v", err))
 		}
@@ -63,6 +65,8 @@ func init() {
 	// and all subcommands, e.g.:
 	// pushCmd.PersistentFlags().String("foo", "", "A help for foo")
 	
+	pushCmd.Flags().IntVar(&part, "part", 0, "When provided as non-zero indicates the part which was pushed")
+	pushCmd.Flags().IntVar(&numOfParts, "parts-total", 0, "When provided as non-zero indicates how many parts should be submitted, when all then it merges contract into a single file")
 	pushCmd.Flags().StringVarP(&specTag, "tag", "t", speccontext.BranchSpecTag, "Provides the tag under which the specification is stored, if '"+speccontext.BranchSpecTag+"' uses Git current branch name")
 	pushCmd.Flags().StringVar(&gitAuthor, "git-author",  "", "Provides the git commit author name")
 	pushCmd.Flags().StringVar(&gitBranch, "git-branch", "", "Provides the git current branch name")

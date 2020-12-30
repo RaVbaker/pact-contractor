@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
-	"strings"
 	
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -12,44 +11,34 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/spf13/afero"
 	
-	"github.com/ravbaker/pact-contractor/internal/speccontext"
+	"github.com/ravbaker/pact-contractor/internal/paths"
 )
 
-func Download(bucket, region, paths, s3VersionID, gitBranch string, gitFlow bool) (err error) {
-	list := extractPaths(paths, s3VersionID)
+func Download(bucket, region, pathsArg, s3VersionID, gitBranch string, gitFlow bool) (err error) {
+	list := paths.Extract(pathsArg, s3VersionID)
 	for path, version := range list {
 		err = downloadPath(bucket, region, path, version, gitBranch, gitFlow)
 		if err != nil {
-			log.Printf("Download of \"%s#%s\" error %v", path, version, err)
+			log.Printf("Download of \"%s#%s\", error %v", path, version, err)
 		}
-	}
-	return
-}
-
-func extractPaths(paths string, versionID string) (out map[string]string) {
-	out = make(map[string]string)
-	pathList := strings.Split(paths, ",")
-	for _, pathWithVersion := range pathList {
-		splitPath := strings.SplitN(pathWithVersion+"#"+versionID, "#", 3)
-		out[splitPath[0]] = splitPath[1]
 	}
 	return
 }
 
 func downloadPath(bucket string, region string, path string, s3VersionID string, gitBranch string, gitFlow bool) (err error) {
-	paths := resolvePath(path, gitBranch, gitFlow)
+	potentialPaths := paths.Resolve(path, gitBranch, gitFlow)
 	af := afero.Afero{Fs: fs}
 	var file afero.File
-	for _, path := range paths {
-		filename := pathToFilename(path, defaultSpecName)
+	for _, path := range potentialPaths {
+		filename := paths.PathToFilename(path)
 		err = af.MkdirAll(filepath.Dir(filename), 0755)
 		if err != nil {
-			return fmt.Errorf("failed to create dir structure %q, %v", filepath.Dir(filename), err)
+			return fmt.Errorf("failed to create dir structure %q, %w", filepath.Dir(filename), err)
 		}
 		// Create a file to write the S3 Object contents to.
 		file, err = af.Create(filename)
 		if err != nil {
-			return fmt.Errorf("failed to create file %q, %v", filename, err)
+			return fmt.Errorf("failed to create file %q, %w", filename, err)
 		}
 		ok := download(bucket, region, path, s3VersionID, filename, file)
 		if ok {
@@ -57,36 +46,6 @@ func downloadPath(bucket string, region string, path string, s3VersionID string,
 		}
 	}
 	return
-}
-
-func resolvePath(path, gitBranch string, gitFlow bool) (paths []string) {
-	if strings.Contains(path, speccontext.BranchSpecTag) {
-		pattern := strings.Replace(path, speccontext.BranchSpecTag, "%s", -1)
-		paths = gitBranchPaths(pattern, gitBranch, gitFlow)
-	} else {
-		paths = append(paths, path)
-	}
-	return
-}
-
-func gitBranchPaths(pattern, branchName string, gitFlow bool) (paths []string) {
-	if branchName == "" {
-		branchName = speccontext.CurrentBranchName()
-	}
-	if branchName != "" {
-		paths = append(paths, fmt.Sprintf(pattern, branchName))
-	}
-	if gitFlow {
-		paths = append(paths, fmt.Sprintf(pattern, speccontext.GitFlowDevelopBranch))
-	}
-	paths = append(paths, fmt.Sprintf(pattern, speccontext.DefaultSpecTag))
-	return
-}
-
-func pathToFilename(path, spec string) string {
-	dir, filename := filepath.Split(path)
-	ext := filepath.Ext(filename)
-	return filepath.Join(dir, spec+ext)
 }
 
 func download(bucket, region, path, s3VersionID, filename string, file afero.File) bool {
@@ -109,7 +68,7 @@ func download(bucket, region, path, s3VersionID, filename string, file afero.Fil
 		VersionId: optionalAWSString(s3VersionID),
 	})
 	if err != nil {
-		log.Printf("failed to download file, %v", err)
+		log.Printf("failed to download file %q from \"%s#%s\", %v", filename, path, s3VersionID, err)
 		return false
 	}
 	if len(s3VersionID) != 0 {
@@ -119,9 +78,3 @@ func download(bucket, region, path, s3VersionID, filename string, file afero.Fil
 	return true
 }
 
-func optionalAWSString(s string) *string {
-	if len(s) == 0 {
-		return nil
-	}
-	return aws.String(s)
-}

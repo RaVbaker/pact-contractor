@@ -3,17 +3,18 @@ package s3
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/spf13/afero"
 	
+	"github.com/ravbaker/pact-contractor/internal/parts"
+	"github.com/ravbaker/pact-contractor/internal/paths"
 	"github.com/ravbaker/pact-contractor/internal/speccontext"
 )
 
-func Upload(bucket, region, filesPath string, ctx speccontext.GitContext) (err error) {
+func Upload(bucket, region, filesPath string, partsScope parts.Scope, ctx speccontext.GitContext) (err error) {
 	var files []string
 	var file afero.File
 	
@@ -21,11 +22,13 @@ func Upload(bucket, region, filesPath string, ctx speccontext.GitContext) (err e
 	
 	files, err = afero.Glob(fs, filesPath)
 	for _, filename := range files {
-		file, err = afero.Afero{Fs: fs}.OpenFile(filename, os.O_RDONLY, 0400)
+		partsScope = PrepareMergedFile(partsScope, bucket, region, filename, ctx)
+		file, err = fs.OpenFile(filename, os.O_RDONLY, 0400)
 		if err != nil {
 			return
 		}
-		path := filenameToPath(filename, ctx.SpecTag)
+		path := paths.FilenameToPath(filename, partsScope, ctx)
+		// consider parts to be uploaded with EXPIRATION DATE or
 		upload(client, bucket, path, file, gitContextToTagsMap(ctx))
 	}
 	return
@@ -47,14 +50,9 @@ func gitContextToTagsMap(ctx speccontext.GitContext) map[string]*string {
 	return tags
 }
 
-func filenameToPath(filename, tag string) string {
-	dir, file := filepath.Split(filename)
-	ext := filepath.Ext(file)
-	return filepath.Join(dir, tag+ext)
-}
-
 // upload puts S3 object
 // @TODO: upload only of content changed
+// @TODO: upload and do json.deepmerge if same revision exists for the branch
 func upload(client s3iface.S3API, bucket, path string, file afero.File, metadata map[string]*string) *string {
 	// Setup the S3 Upload Manager. Also see the SDK doc for the Upload Manager
 	// for more information on configuring part size, and concurrency.
