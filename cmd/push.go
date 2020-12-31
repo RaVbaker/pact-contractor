@@ -42,7 +42,7 @@ var pushCmd = &cobra.Command{
 	Short: "Push generated pact contracts to configured S3 bucket, (default path=\"" + defaultFilesPath + "\")",
 	Long: `Push generated pact contracts, based on path to configured S3 bucket
 
-Default path="` + defaultFilesPath + `", but can be configured until it's in Glob format and ends with "spec.json"`,
+Default path="` + defaultFilesPath + `", but can be configured until it's in Glob format.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
 			args = append(args, defaultFilesPath)

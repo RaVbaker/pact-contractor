@@ -33,6 +33,7 @@ In the future, it should also help in configuration of a "hook" that could run e
 * `pact-contractor pull [path]` Pulls pact contracts from configured S3 bucket
 * `pact-contractor push` Push generated pact contracts to configured S3 bucket, (default path="pacts/*/*/spec.json")
 * `pact-contractor verification [path] [status]` To submit status of contract verification and store it in S3 Object Tag
+* `pact-contractor list [path]` To show list of contracts. 
 
 Configuration flags are: 
 

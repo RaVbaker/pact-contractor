@@ -25,6 +25,10 @@ func Upload(bucket, region, filesPath string, partContext parts.Context, ctx spe
 	if err != nil {
 		return
 	}
+
+	if len(files) == 0 {
+		return fmt.Errorf("no files found for path: %q", filesPath)
+	}
 	for _, filename := range files {
 		partContext = PrepareMergedFile(partContext, bucket, region, filename, ctx)
 		file, err = fs.OpenFile(filename, os.O_RDONLY, 0400)
