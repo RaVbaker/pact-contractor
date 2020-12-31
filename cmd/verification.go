@@ -37,17 +37,18 @@ var verificationCmd = &cobra.Command{
 	Long: `Stores verification status in AWS S3 path object Tag.
 
 The Tag is called "Pact Verification" and contains the [status] value.
-Rules for [paths] are same as for pull command, so they can contain the version.`,
+Rules for [paths] are same as for pull command, so they can contain the S3Object VersionId.
+Optional fields about provider can be set with flags.`,
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		err := verification.PublishVerification(viper.GetString("bucket"), viper.GetString("region"), args[0], args[1], verifiedS3VersionID, providerVersion)
+		err := verification.PublishVerification(viper.GetString("bucket"), viper.GetString("region"), args[0], args[1], verifiedS3VersionID, providerVersion, providerContext)
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
 	},
 }
 
-var providerVersion, verifiedS3VersionID string
+var providerVersion, providerContext, verifiedS3VersionID string
 
 func init() {
 	rootCmd.AddCommand(verificationCmd)
@@ -59,5 +60,6 @@ func init() {
 	// verificationCmd.PersistentFlags().String("foo", "", "A help for foo")
 	
 	verificationCmd.Flags().StringVarP(&providerVersion, "provider-version", "p", "", "Provider version/tag stored")
+	verificationCmd.Flags().StringVarP(&providerContext, "provider-context", "o", "", "Provides optional provider context (e.g. Build identifier or URL) value stored in Object Tags")
 	verificationCmd.Flags().StringVar(&verifiedS3VersionID, "version", "", "Provides AWS S3 Object VersionID for verification")
 }

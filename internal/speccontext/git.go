@@ -25,7 +25,7 @@ type GitContext struct {
 }
 
 
-func NewGitContext(specTag, author, branch, commitSHA string) GitContext {
+func NewGitContext(specTag, origin, author, branch, commitSHA string) GitContext {
 	gitContext := extractGitContext(commitSHA)
 	
 	// overwrite extracted values
@@ -43,7 +43,7 @@ func NewGitContext(specTag, author, branch, commitSHA string) GitContext {
 		}
 	}
 	
-	gitContext.Context = NewContext(specTag)
+	gitContext.Context = NewContext(specTag, origin)
 	return gitContext
 }
 

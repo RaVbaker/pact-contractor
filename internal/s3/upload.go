@@ -54,6 +54,10 @@ func contextsToTagsMap(ctx speccontext.GitContext, partContext speccontext.Parts
 		tags["Branch"] = aws.String(ctx.Branch)
 	}
 	
+	if len(ctx.Origin) != 0 {
+		tags["Origin"] = aws.String(ctx.Origin)
+	}
+	
 	if partContext.Defined() && !partContext.Merged() {
 		tags["Part"] = aws.String(partContext.Name())
 	}

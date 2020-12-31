@@ -15,7 +15,7 @@ In the future, it should also help in configuration of a "hook" that could run e
 
 1. When `push` called it stores contracts from `pacts/{provider-name}/{consumer-name}/spec.json` files in S3 appropriate tag-based files. E.g. `pacts/{provider-name}/{consumer-name}/main.json` or `pacts/{provider-name}/{consumer-name}/develop.json`. 
 2. Objects in S3 should use S3 versioning and metadata and tagging. The versioning would allow accessing uploaded in past contracts. Metadata would contain some meta information of the contract. Like: Author, CommitSHA, Branch + Origin context, a freeform value for BuildID etc.
-3. The  Verification Status will be stored in Object Tags or separate S3 object. There should be a helper to push the verification status to S3. [@TODO]
+3. The  Verification Status will be stored in Object Tags or separate S3 object. There should be a helper to push the verification status to S3.
 4. It assumes it runs in Git environment where it can interfere tag from branch name (with `main` as default, so if legacy `master` branch is present it maps it to `main` name), extracts details like Author, CommitSHA and Branch name from Git data. All options can also be provided on a command using flags (useful in CI environment).
 5. Config file can be kept not only globally per-user in $HOMEDIR but also in local `pacts/` directory and interfered if present.
 6. Pulling of the contracts should allow some dynamic specTag detection.
@@ -25,12 +25,14 @@ In the future, it should also help in configuration of a "hook" that could run e
     * AWS Lambda - that is based on S3 hooks executed when new file is uploaded/updated. The tool helps in marking the status of verification which is stored in S3 Object Tags and setting up the Lambdas in AWS.
     * GitHub Actions - similar to Local but runs the code/verification using GitHub Action. Also here it is planned to support such setup also on preparation part.
 9. Contracts deep-merge might be needed if existing version of contract is defined as same commitsha. Especially in usecase like we have with split build runs.
+10. 
 
 --- 
 ## Basic usage
 
-* `pact-contractor pull [path]`        Pulls pact contracts from configured S3 bucket
-* `pact-contractor push`        Push generated pact contracts to configured S3 bucket, (default path="pacts/*/*/spec.json")
+* `pact-contractor pull [path]` Pulls pact contracts from configured S3 bucket
+* `pact-contractor push` Push generated pact contracts to configured S3 bucket, (default path="pacts/*/*/spec.json")
+* `pact-contractor verification [path] [status]` To submit status of contract verification and store it in S3 Object Tag
 
 Configuration flags are: 
 

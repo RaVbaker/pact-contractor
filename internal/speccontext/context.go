@@ -11,11 +11,12 @@ const (
 
 type Context struct {
 	SpecTag string
+	Origin string
 	VerificationStatus bool
 }
 
-func NewContext(specTag string) Context {
-	return Context{SpecTag: specTag}
+func NewContext(specTag, origin string) Context {
+	return Context{SpecTag: specTag, Origin: origin}
 }
 
 var fs afero.Fs
