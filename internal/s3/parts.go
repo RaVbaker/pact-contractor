@@ -9,28 +9,28 @@ import (
 	"github.com/ravbaker/pact-contractor/internal/speccontext"
 )
 
-func PrepareMergedFile(scope parts.Scope, bucket, region, filename string, ctx speccontext.GitContext) parts.Scope {
-	partPaths := downloadParts(scope, bucket, region, filename, ctx)
+func PrepareMergedFile(partContext parts.Context, bucket, region, filename string, ctx speccontext.GitContext) parts.Context {
+	partPaths := downloadParts(partContext, bucket, region, filename, ctx)
 	if len(partPaths) == 0 {
-		return scope
+		return partContext
 	}
 	
 	err := parts.Merge(filename, partPaths, ctx)
 	if err != nil {
 		log.Printf("Couldn't merge parts, error: %v", err)
-		return scope
+		return partContext
 	}
-	scope.MarkAsMerged()
+	partContext.MarkAsMerged()
 	
 	// 	cleanup locally and on S3
 	fs.RemoveAll(paths.CleanupPathForParts(filename, ctx))
 	for _, path := range partPaths {
 		Delete(bucket, region, path)
 	}
-	return scope
+	return partContext
 }
 
-func downloadParts(scope parts.Scope, bucket, region, filename string, ctx speccontext.GitContext) (partPaths []string) {
+func downloadParts(scope parts.Context, bucket, region, filename string, ctx speccontext.GitContext) (partPaths []string) {
 	for part := 1; part <= scope.Total(); part++ {
 		path := paths.FilenameToPath(filename, parts.NewScope(part, scope.Total()), ctx)
 		if part != scope.Current() {

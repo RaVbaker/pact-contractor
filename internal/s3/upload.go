@@ -2,6 +2,7 @@ package s3
 
 import (
 	"fmt"
+	"log"
 	"os"
 	
 	"github.com/aws/aws-sdk-go/aws"
@@ -14,7 +15,7 @@ import (
 	"github.com/ravbaker/pact-contractor/internal/speccontext"
 )
 
-func Upload(bucket, region, filesPath string, partsScope parts.Scope, ctx speccontext.GitContext) (err error) {
+func Upload(bucket, region, filesPath string, partContext parts.Context, ctx speccontext.GitContext) (err error) {
 	var files []string
 	var file afero.File
 	
@@ -22,37 +23,39 @@ func Upload(bucket, region, filesPath string, partsScope parts.Scope, ctx specco
 	
 	files, err = afero.Glob(fs, filesPath)
 	for _, filename := range files {
-		partsScope = PrepareMergedFile(partsScope, bucket, region, filename, ctx)
+		partContext = PrepareMergedFile(partContext, bucket, region, filename, ctx)
 		file, err = fs.OpenFile(filename, os.O_RDONLY, 0400)
 		if err != nil {
 			return
 		}
-		path := paths.FilenameToPath(filename, partsScope, ctx)
-		// consider parts to be uploaded with EXPIRATION DATE or
-		upload(client, bucket, path, file, gitContextToTagsMap(ctx))
+		path := paths.FilenameToPath(filename, partContext, ctx)
+		upload(client, bucket, path, file, contextsToTagsMap(ctx, partContext))
 	}
 	return
 }
 
-func gitContextToTagsMap(ctx speccontext.GitContext) map[string]*string {
+func contextsToTagsMap(ctx speccontext.GitContext, partContext speccontext.PartsContext) map[string]*string {
 	tags := make(map[string]*string)
 	if len(ctx.Author) != 0 {
-		tags["Author"] = &ctx.Author
+		tags["Author"] = aws.String(ctx.Author)
 	}
 	
 	if len(ctx.CommitSHA) != 0 {
-		tags["CommitSHA"] = &ctx.CommitSHA
+		tags["CommitSHA"] = aws.String(ctx.CommitSHA)
 	}
 	
 	if len(ctx.Branch) != 0 {
-		tags["Branch"] = &ctx.Branch
+		tags["Branch"] = aws.String(ctx.Branch)
+	}
+	
+	if partContext.Total() > 0 {
+		tags["Part"] = aws.String(partContext.Name())
 	}
 	return tags
 }
 
 // upload puts S3 object
 // @TODO: upload only of content changed
-// @TODO: upload and do json.deepmerge if same revision exists for the branch
 func upload(client s3iface.S3API, bucket, path string, file afero.File, metadata map[string]*string) *string {
 	// Setup the S3 Upload Manager. Also see the SDK doc for the Upload Manager
 	// for more information on configuring part size, and concurrency.
@@ -83,7 +86,16 @@ func upload(client s3iface.S3API, bucket, path string, file afero.File, metadata
 		panic(fmt.Sprintf("Unable to upload %q to %q, %v", path, bucket, err))
 	}
 	
+	// Tagging Part name
+	if partName, ok := metadata["Part"]; ok {
+		versionId := *uploadedObject.VersionID
+		err = Tag(client, bucket, path, versionId, map[string]*string{ "Part": partName })
+		if err != nil {
+			log.Printf("Couldn't mark object %q#%q in %q with PartTag, error: %v", path, versionId, bucket, err)
+		}
+	}
 	
 	fmt.Printf("Successfully uploaded %q [version: %q] to %q\n", path, *uploadedObject.VersionID, bucket)
 	return uploadedObject.VersionID
 }
+
