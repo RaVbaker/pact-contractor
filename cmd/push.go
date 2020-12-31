@@ -23,10 +23,10 @@ package cmd
 
 import (
 	"log"
-	
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	
+
 	"github.com/ravbaker/pact-contractor/internal/parts"
 	"github.com/ravbaker/pact-contractor/internal/s3"
 	"github.com/ravbaker/pact-contractor/internal/speccontext"
@@ -39,10 +39,10 @@ var part, numOfParts int
 
 var pushCmd = &cobra.Command{
 	Use:   "push [path]",
-	Short: "Push generated pact contracts to configured S3 bucket, (default path=\""+defaultFilesPath+"\")",
+	Short: "Push generated pact contracts to configured S3 bucket, (default path=\"" + defaultFilesPath + "\")",
 	Long: `Push generated pact contracts, based on path to configured S3 bucket
 
-Default path="`+defaultFilesPath+`", but can be configured until it's in Glob format and ends with "spec.json"`,
+Default path="` + defaultFilesPath + `", but can be configured until it's in Glob format and ends with "spec.json"`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
 			args = append(args, defaultFilesPath)
@@ -64,12 +64,12 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// pushCmd.PersistentFlags().String("foo", "", "A help for foo")
-	
+
 	pushCmd.Flags().IntVar(&part, "part", 0, "When provided as non-zero indicates the part which was pushed")
 	pushCmd.Flags().IntVar(&numOfParts, "parts-total", 0, "When provided as non-zero indicates how many parts should be submitted, when all then it merges contract into a single file")
 	pushCmd.Flags().StringVarP(&specTag, "tag", "t", speccontext.BranchSpecTag, "Provides the tag under which the specification is stored, if '"+speccontext.BranchSpecTag+"' uses Git current branch name")
 	pushCmd.Flags().StringVarP(&contextOrigin, "context", "o", "", "Provides optional context origin (e.g. Build identifier or URL) value stored with S3 Object metadata")
-	pushCmd.Flags().StringVar(&gitAuthor, "git-author",  "", "Provides the git commit author name")
+	pushCmd.Flags().StringVar(&gitAuthor, "git-author", "", "Provides the git commit author name")
 	pushCmd.Flags().StringVar(&gitBranch, "git-branch", "", "Provides the git current branch name")
 	pushCmd.Flags().StringVar(&gitCommitSHA, "git-commit-sha", "", "Provides the git commit SHA reference, if provided can be an origin of author/branch name")
 }

@@ -25,19 +25,18 @@ import (
 	"fmt"
 	"log"
 	"os"
-	
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	
+
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
 var (
-	cfgFile string
+	cfgFile    string
 	bucketName string
 	RegionName string
-	
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -98,14 +97,13 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
-	
+
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		log.Println("Using config file:", viper.ConfigFileUsed())
 		presetRequiredFlags(rootCmd)
 	}
 }
-
 
 func presetRequiredFlags(cmd *cobra.Command) {
 	viper.BindPFlags(cmd.Flags())

@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
-	
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/spf13/afero"
-	
+
 	"github.com/ravbaker/pact-contractor/internal/paths"
 )
 
@@ -54,17 +54,17 @@ func download(bucket, region, path, s3VersionID, filename string, file afero.Fil
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String(region)},
 	)
-	
+
 	// Setup the S3 Upload Manager. Also see the SDK doc for the Upload Manager
 	// for more information on configuring part size, and concurrency.
 	//
 	// http://docs.aws.amazon.com/sdk-for-go/api/service/s3/s3manager/#NewUploader
 	downloader := s3manager.NewDownloader(sess)
-	
+
 	// Write the contents of S3 Object to the file
 	n, err := downloader.Download(file, &s3.GetObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(path),
+		Bucket:    aws.String(bucket),
+		Key:       aws.String(path),
 		VersionId: optionalAWSString(s3VersionID),
 	})
 	if err != nil {
@@ -77,4 +77,3 @@ func download(bucket, region, path, s3VersionID, filename string, file afero.Fil
 	fmt.Printf("Successfully downloaded %q%s from bucket %q to file %q, %d bytes\n", path, s3VersionID, bucket, filename, n)
 	return true
 }
-

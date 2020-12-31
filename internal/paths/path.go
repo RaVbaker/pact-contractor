@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	
+
 	"github.com/ravbaker/pact-contractor/internal/speccontext"
 )
 
@@ -46,7 +46,5 @@ func gitBranchPaths(pattern, branchName string, gitFlow bool) (paths []string) {
 func PathToFilename(path string) string {
 	dir, tagFilename := filepath.Split(path)
 	ext := filepath.Ext(tagFilename)
-	return strings.TrimRight(dir, string(os.PathSeparator))+ext
+	return strings.TrimRight(dir, string(os.PathSeparator)) + ext
 }
-
-

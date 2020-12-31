@@ -5,8 +5,8 @@ import (
 )
 
 type Context struct {
-	num int
-	total int
+	num    int
+	total  int
 	merged bool
 }
 

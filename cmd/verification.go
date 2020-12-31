@@ -23,10 +23,10 @@ package cmd
 
 import (
 	"log"
-	
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	
+
 	"github.com/ravbaker/pact-contractor/internal/verification"
 )
 
@@ -58,7 +58,7 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// verificationCmd.PersistentFlags().String("foo", "", "A help for foo")
-	
+
 	verificationCmd.Flags().StringVarP(&providerVersion, "provider-version", "p", "", "Provider version/tag stored")
 	verificationCmd.Flags().StringVarP(&providerContext, "provider-context", "o", "", "Provides optional provider context (e.g. Build identifier or URL) value stored in Object Tags")
 	verificationCmd.Flags().StringVar(&verifiedS3VersionID, "version", "", "Provides AWS S3 Object VersionID for verification")

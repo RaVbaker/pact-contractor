@@ -2,7 +2,7 @@ package paths
 
 import (
 	"path/filepath"
-	
+
 	"github.com/ravbaker/pact-contractor/internal/speccontext"
 )
 

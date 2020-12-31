@@ -23,10 +23,10 @@ package cmd
 
 import (
 	"log"
-	
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	
+
 	"github.com/ravbaker/pact-contractor/internal/s3"
 )
 

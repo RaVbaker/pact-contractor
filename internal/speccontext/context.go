@@ -5,13 +5,13 @@ import (
 )
 
 const (
-	BranchSpecTag = "{branch}"
-	DefaultSpecTag  = "main"
+	BranchSpecTag  = "{branch}"
+	DefaultSpecTag = "main"
 )
 
 type Context struct {
-	SpecTag string
-	Origin string
+	SpecTag            string
+	Origin             string
 	VerificationStatus bool
 }
 
