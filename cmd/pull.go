@@ -22,6 +22,8 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"os"
+	
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	
@@ -42,12 +44,12 @@ The paths can be a list of paths separated by comma and with optional version de
 "paths/foo/bar/test.json#some-v3rsion-1D,paths/foo/baz/{branch}.json#oth3r-v3rsion-1D"
 When paths are resolved with same values last definition is downloaded.
 `,
-	Args: cobra.MinimumNArgs(1),
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		paths := args[0]
 		err := s3.Download(viper.GetString("bucket"), viper.GetString("region"), paths, s3VersionID, gitBranchName, gitFlow)
 		if err != nil {
-			panic(err)
+			os.Exit(-1)
 		}
 	},
 }

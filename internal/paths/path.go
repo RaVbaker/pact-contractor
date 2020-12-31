@@ -9,11 +9,6 @@ import (
 	"github.com/ravbaker/pact-contractor/internal/speccontext"
 )
 
-const (
-	DefaultSpecName = "spec" // must match defaultFilesPath
-)
-
-
 func Extract(paths string, versionID string) (out map[string]string) {
 	out = make(map[string]string)
 	pathList := strings.Split(paths, ",")

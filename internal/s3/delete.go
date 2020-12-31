@@ -9,7 +9,7 @@ import (
 )
 
 func Delete(bucket, region, path string) bool {
-	client := newClient(region)
+	client := NewClient(region)
 	
 	_, err := client.DeleteObject(&s3.DeleteObjectInput{
 		Bucket: aws.String(bucket),

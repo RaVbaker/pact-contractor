@@ -15,7 +15,7 @@ func Tag(client s3iface.S3API, bucket string, path, versionId string, tags map[s
 		Bucket:    aws.String(bucket),
 		Key:       aws.String(path),
 		Tagging:   &s3.Tagging{TagSet: tagSet},
-		VersionId: aws.String(versionId),
+		VersionId: optionalAWSString(versionId),
 	})
 	return
 }

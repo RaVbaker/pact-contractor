@@ -28,8 +28,8 @@ import (
 	"github.com/spf13/viper"
 	
 	"github.com/ravbaker/pact-contractor/internal/parts"
-	"github.com/ravbaker/pact-contractor/internal/speccontext"
 	"github.com/ravbaker/pact-contractor/internal/s3"
+	"github.com/ravbaker/pact-contractor/internal/speccontext"
 )
 
 const defaultFilesPath = "pacts/*/*/spec.json"
@@ -49,7 +49,7 @@ Default path="`+defaultFilesPath+`", but can be configured until it's in Glob fo
 		}
 		partsScope := parts.NewScope(part, numOfParts)
 		ctx := speccontext.NewGitContext(specTag, gitAuthor, gitBranch, gitCommitSHA)
-		err:= s3.Upload(viper.GetString("bucket"), viper.GetString("region"), args[0], partsScope, ctx)
+		err := s3.Upload(viper.GetString("bucket"), viper.GetString("region"), args[0], partsScope, ctx)
 		if err != nil {
 			panic(fmt.Sprintf("%v", err))
 		}

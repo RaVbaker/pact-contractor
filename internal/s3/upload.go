@@ -19,7 +19,7 @@ func Upload(bucket, region, filesPath string, partContext parts.Context, ctx spe
 	var files []string
 	var file afero.File
 	
-	client := newClient(region)
+	client := NewClient(region)
 	
 	files, err = afero.Glob(fs, filesPath)
 	for _, filename := range files {
