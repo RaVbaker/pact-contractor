@@ -2,6 +2,7 @@ package paths
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 	
@@ -48,9 +49,9 @@ func gitBranchPaths(pattern, branchName string, gitFlow bool) (paths []string) {
 }
 
 func PathToFilename(path string) string {
-	dir, filename := filepath.Split(path)
-	ext := filepath.Ext(filename)
-	return filepath.Join(dir, DefaultSpecName+ext)
+	dir, tagFilename := filepath.Split(path)
+	ext := filepath.Ext(tagFilename)
+	return strings.TrimRight(dir, string(os.PathSeparator))+ext
 }
 
 
