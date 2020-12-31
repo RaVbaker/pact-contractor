@@ -22,6 +22,8 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"log"
+	
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	
@@ -38,7 +40,10 @@ The Tag is called "Pact Verification" and contains the [status] value.
 Rules for [paths] are same as for pull command, so they can contain the version.`,
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		verification.PublishVerification(viper.GetString("bucket"), viper.GetString("region"), args[0], args[1], verifiedS3VersionID, providerVersion)
+		err := verification.PublishVerification(viper.GetString("bucket"), viper.GetString("region"), args[0], args[1], verifiedS3VersionID, providerVersion)
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
 	},
 }
 

@@ -22,7 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
+	"log"
 	
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -51,7 +51,7 @@ Default path="`+defaultFilesPath+`", but can be configured until it's in Glob fo
 		ctx := speccontext.NewGitContext(specTag, gitAuthor, gitBranch, gitCommitSHA)
 		err := s3.Upload(viper.GetString("bucket"), viper.GetString("region"), args[0], partsScope, ctx)
 		if err != nil {
-			panic(fmt.Sprintf("%v", err))
+			log.Fatalf("%v\n", err)
 		}
 	},
 }

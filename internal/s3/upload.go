@@ -22,6 +22,9 @@ func Upload(bucket, region, filesPath string, partContext parts.Context, ctx spe
 	client := NewClient(region)
 	
 	files, err = afero.Glob(fs, filesPath)
+	if err != nil {
+		return
+	}
 	for _, filename := range files {
 		partContext = PrepareMergedFile(partContext, bucket, region, filename, ctx)
 		file, err = fs.OpenFile(filename, os.O_RDONLY, 0400)
@@ -29,7 +32,10 @@ func Upload(bucket, region, filesPath string, partContext parts.Context, ctx spe
 			return
 		}
 		path := paths.FilenameToPath(filename, partContext, ctx)
-		upload(client, bucket, path, file, contextsToTagsMap(ctx, partContext))
+		_, err = upload(client, bucket, path, file, contextsToTagsMap(ctx, partContext))
+		if err != nil {
+			return
+		}
 	}
 	return
 }
@@ -48,7 +54,7 @@ func contextsToTagsMap(ctx speccontext.GitContext, partContext speccontext.Parts
 		tags["Branch"] = aws.String(ctx.Branch)
 	}
 	
-	if partContext.Total() > 0 {
+	if partContext.Defined() && !partContext.Merged() {
 		tags["Part"] = aws.String(partContext.Name())
 	}
 	return tags
@@ -56,7 +62,7 @@ func contextsToTagsMap(ctx speccontext.GitContext, partContext speccontext.Parts
 
 // upload puts S3 object
 // @TODO: upload only of content changed
-func upload(client s3iface.S3API, bucket, path string, file afero.File, metadata map[string]*string) *string {
+func upload(client s3iface.S3API, bucket, path string, file afero.File, metadata map[string]*string) (*string, error) {
 	// Setup the S3 Upload Manager. Also see the SDK doc for the Upload Manager
 	// for more information on configuring part size, and concurrency.
 	//
@@ -83,7 +89,7 @@ func upload(client s3iface.S3API, bucket, path string, file afero.File, metadata
 	})
 	if err != nil {
 		// Print the error and exit.
-		panic(fmt.Sprintf("Unable to upload %q to %q, %v", path, bucket, err))
+		return nil, fmt.Errorf("unable to upload %q to %q, %w", path, bucket, err)
 	}
 	
 	// Tagging Part name
@@ -96,6 +102,6 @@ func upload(client s3iface.S3API, bucket, path string, file afero.File, metadata
 	}
 	
 	fmt.Printf("Successfully uploaded %q [version: %q] to %q\n", path, *uploadedObject.VersionID, bucket)
-	return uploadedObject.VersionID
+	return uploadedObject.VersionID, nil
 }
 

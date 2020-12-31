@@ -22,7 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"os"
+	"log"
 	
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -49,7 +49,7 @@ When paths are resolved with same values last definition is downloaded.
 		paths := args[0]
 		err := s3.Download(viper.GetString("bucket"), viper.GetString("region"), paths, s3VersionID, gitBranchName, gitFlow)
 		if err != nil {
-			os.Exit(-1)
+			log.Fatalf("%v", err)
 		}
 	},
 }
