@@ -30,8 +30,9 @@ import (
 
 // checkCmd represents the canIDeploy command
 var checkCmd = &cobra.Command{
-	Use:   "can-i-deploy [path]",
-	Short: "Checks the verification status of the contract",
+	Use:     "can-i-deploy [path]",
+	Aliases: []string{"get"},
+	Short:   "Checks the verification status of the contract",
 	Long: `Checks the verification status of the contract, when it is "success"
 then return ExitCode 0, otherwise non-zero.
 

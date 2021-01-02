@@ -30,8 +30,9 @@ import (
 
 // submitCmd represents the verification command
 var submitCmd = &cobra.Command{
-	Use:   "submit [paths] [verification-status]",
-	Short: "Stores verification status in S3 Object Tag",
+	Aliases: []string{"submit-verification"},
+	Use:     "submit [paths] [verification-status]",
+	Short:   "Stores verification status in S3 Object Tag",
 	Long: `Stores verification status in AWS S3 path object Tag.
 
 The Tag is called "Pact Verification" and contains the [status] value.
