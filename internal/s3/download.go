@@ -29,8 +29,9 @@ func downloadPath(bucket string, region string, path string, s3VersionID string,
 	potentialPaths := paths.Resolve(path, gitBranch, gitFlow)
 	af := afero.Afero{Fs: fs}
 	var file afero.File
-	for _, path := range potentialPaths {
-		filename := paths.PathToFilename(path)
+	var ok bool
+	for _, potentialPath := range potentialPaths {
+		filename := paths.PathToFilename(potentialPath)
 		err = af.MkdirAll(filepath.Dir(filename), 0755)
 		if err != nil {
 			return fmt.Errorf("failed to create dir structure %q, %w", filepath.Dir(filename), err)
@@ -40,10 +41,14 @@ func downloadPath(bucket string, region string, path string, s3VersionID string,
 		if err != nil {
 			return fmt.Errorf("failed to create file %q, %w", filename, err)
 		}
-		ok := download(bucket, region, path, s3VersionID, filename, file)
+		ok = download(bucket, region, potentialPath, s3VersionID, filename, file)
 		if ok {
 			break
 		}
+	}
+	if !ok {
+		err = fmt.Errorf("failed to download %q#%s from %s bucket into file", path, s3VersionID, bucket)
+
 	}
 	return
 }

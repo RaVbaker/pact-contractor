@@ -30,9 +30,9 @@ import (
 	"github.com/ravbaker/pact-contractor/internal/verification"
 )
 
-// verificationCmd represents the verification command
-var verificationCmd = &cobra.Command{
-	Use:   "verification [paths] [status]",
+// submitCmd represents the verification command
+var submitCmd = &cobra.Command{
+	Use:   "submit [paths] [verification-status]",
 	Short: "Stores verification status in S3 Object Tag",
 	Long: `Stores verification status in AWS S3 path object Tag.
 
@@ -51,15 +51,15 @@ Optional fields about provider can be set with flags.`,
 var providerVersion, providerContext, verifiedS3VersionID string
 
 func init() {
-	rootCmd.AddCommand(verificationCmd)
+	rootCmd.AddCommand(submitCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// verificationCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// submitCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	verificationCmd.Flags().StringVarP(&providerVersion, "provider-version", "p", "", "Provider version/tag stored")
-	verificationCmd.Flags().StringVarP(&providerContext, "provider-context", "o", "", "Provides optional provider context (e.g. Build identifier or URL) value stored in Object Tags")
-	verificationCmd.Flags().StringVar(&verifiedS3VersionID, "version", "", "Provides AWS S3 Object VersionID for verification")
+	submitCmd.Flags().StringVarP(&providerVersion, "provider-version", "p", "", "Provider version/tag stored")
+	submitCmd.Flags().StringVarP(&providerContext, "provider-context", "o", "", "Provides optional provider context (e.g. Build identifier or URL) value stored in Object Tags")
+	submitCmd.Flags().StringVar(&verifiedS3VersionID, "version", "", "Provides AWS S3 Object VersionID for verification")
 }

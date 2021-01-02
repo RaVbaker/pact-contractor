@@ -25,14 +25,14 @@ In the future, it should also help in configuration of a "hook" that could run e
     * AWS Lambda - that is based on S3 hooks executed when new file is uploaded/updated. The tool helps in marking the status of verification which is stored in S3 Object Tags and setting up the Lambdas in AWS.
     * GitHub Actions - similar to Local but runs the code/verification using GitHub Action. Also here it is planned to support such setup also on preparation part.
 9. Contracts deep-merge might be needed if existing version of contract is defined as same commitsha. Especially in usecase like we have with split build runs.
-10. 
+10. `verify [path]` helper command that accepts as argument a command to run for verification and does the `pull [path]` & `submit [path] [verification-status]` around it.
 
 --- 
 ## Basic usage
 
 * `pact-contractor pull [path]` Pulls pact contracts from configured S3 bucket
 * `pact-contractor push` Push generated pact contracts to configured S3 bucket, (default path="pacts/*/*/spec.json")
-* `pact-contractor verification [path] [status]` To submit status of contract verification and store it in S3 Object Tag
+* `pact-contractor submit [path] [verification-status]` To submit status of contract verification and store it in S3 Object Tag
 * `pact-contractor list [path]` To show list of contracts. 
 
 Configuration flags are: 

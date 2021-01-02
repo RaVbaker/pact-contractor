@@ -18,7 +18,7 @@ func PublishVerification(bucket, region, pathsArg, status, s3VersionID, provider
 		}
 	}
 
-	fmt.Printf("Successfully marked as %q all paths: %q in bucket %s\n", status, pathsArg, bucket)
+	fmt.Printf("Marked as %q all paths: %q in bucket %s\n", status, pathsArg, bucket)
 	return nil
 }
 
