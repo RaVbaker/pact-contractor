@@ -12,6 +12,7 @@ func PublishVerification(bucket, region, pathsArg, status, s3VersionID, provider
 	tags := tagsList(status, providerVersion, providerContext)
 
 	for path, version := range list {
+
 		err = s3.Tag(s3.NewClient(region), bucket, path, version, tags)
 		if err != nil {
 			return

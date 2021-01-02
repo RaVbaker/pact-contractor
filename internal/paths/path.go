@@ -21,12 +21,25 @@ func Extract(paths string, versionID string) (out map[string]string) {
 
 func Resolve(path, gitBranch string, gitFlow bool) (paths []string) {
 	if strings.Contains(path, speccontext.BranchSpecTag) {
-		pattern := strings.Replace(path, speccontext.BranchSpecTag, "%s", -1)
+		pattern := strings.Replace(path, speccontext.BranchSpecTag, "%s", 1)
 		paths = gitBranchPaths(pattern, gitBranch, gitFlow)
 	} else {
 		paths = append(paths, path)
 	}
 	return
+}
+
+// ForBranch returns first path that has all values substituted
+// like {branch} from git or argument and when the VerisonID is stripped
+// from the path if present
+func ForBranch(path, s3VersionID, gitBranchName string) string {
+	extractedPaths := Extract(path, s3VersionID)
+	for extractedPath, _ := range extractedPaths {
+		path = extractedPath
+		break
+	}
+	resolvedPaths := Resolve(path, gitBranchName, false)
+	return resolvedPaths[0]
 }
 
 func gitBranchPaths(pattern, branchName string, gitFlow bool) (paths []string) {

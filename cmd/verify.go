@@ -29,6 +29,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/ravbaker/pact-contractor/internal/paths"
 )
 
 // verifyCmd represents the verify command
@@ -47,15 +49,24 @@ The path from first argument can be substituted in --cmd with "{path}" pattern,
 which default value is for Ruby "bundle exec rake pact:verify:at[{path}]".
 But feel free to set the "cmd" in config file for convenience.
 Submitted status is detected from exitCode and 0 is interpreted as "success"
-and any other as "failure".`,
+and any other as "failure".
+
+If the {branch} pattern is used in the path and the currently provided/examined
+branch doesn't have a contract then the submit of verification will fail`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		path := args[0]
-		pullCmd.Run(cmd, []string{path})
+		path := paths.ForBranch(args[0], s3VersionID, gitBranchName)
+
+		err := pullCmd.RunE(cmd, []string{path})
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
 
 		cmdToRun := viper.GetString("cmd")
+
 		const pathPattern = "{path}"
-		cmdToRun = strings.ReplaceAll(cmdToRun, pathPattern, path)
+		filename := paths.PathToFilename(path)
+		cmdToRun = strings.ReplaceAll(cmdToRun, pathPattern, filename)
 
 		runCmd := exec.Command("bash", "-c", cmdToRun)
 		out, err := runCmd.CombinedOutput()
@@ -66,7 +77,10 @@ and any other as "failure".`,
 			log.Printf("Command error: %v", err)
 		}
 
-		submitCmd.Run(cmd, []string{path, verificationStatus})
+		err = submitCmd.RunE(cmd, []string{path, verificationStatus})
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
 	},
 }
 

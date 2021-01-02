@@ -26,7 +26,7 @@ In the future, it should also help in configuration of a "hook" that could run e
     * GitHub Actions - similar to Local but runs the code/verification using GitHub Action. Also here it is planned to support such setup also on preparation part.
 9. Contracts deep-merge might be needed if existing version of contract is defined as same commitsha. Especially in usecase like we have with split build runs.
 10. `verify [path]` helper command that accepts as argument a command to run for verification and does the `pull [path]` & `submit [path] [verification-status]` around it.
-
+11. `can-i-deploy` checks verification status on a path#version and prints details of the object and verification. [@todo]
 --- 
 ## Basic usage
 
