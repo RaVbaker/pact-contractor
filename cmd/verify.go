@@ -55,7 +55,7 @@ If the {branch} pattern is used in the path and the currently provided/examined
 branch doesn't have a contract then the submit of verification will fail`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		path := paths.ForBranch(args[0], s3VersionID, gitBranchName)
+		path, _ := paths.ForBranch(args[0], s3VersionID, gitBranchName)
 
 		err := pullCmd.RunE(cmd, []string{path})
 		if err != nil {

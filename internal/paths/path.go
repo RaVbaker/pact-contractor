@@ -32,14 +32,15 @@ func Resolve(path, gitBranch string, gitFlow bool) (paths []string) {
 // ForBranch returns first path that has all values substituted
 // like {branch} from git or argument and when the VerisonID is stripped
 // from the path if present
-func ForBranch(path, s3VersionID, gitBranchName string) string {
+func ForBranch(path, s3VersionID, gitBranchName string) (string, string) {
 	extractedPaths := Extract(path, s3VersionID)
-	for extractedPath, _ := range extractedPaths {
+	for extractedPath, versionID := range extractedPaths {
 		path = extractedPath
+		s3VersionID = versionID
 		break
 	}
 	resolvedPaths := Resolve(path, gitBranchName, false)
-	return resolvedPaths[0]
+	return resolvedPaths[0], s3VersionID
 }
 
 func gitBranchPaths(pattern, branchName string, gitFlow bool) (paths []string) {
