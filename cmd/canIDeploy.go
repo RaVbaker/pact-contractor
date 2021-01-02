@@ -32,7 +32,7 @@ import (
 var checkCmd = &cobra.Command{
 	Use:     "can-i-deploy [path]",
 	Aliases: []string{"get"},
-	Short:   "Checks the verification status of the contract",
+	Short:   "Checks the verification status of the contract and displays details of a path, alias: get",
 	Long: `Checks the verification status of the contract, when it is "success"
 then return ExitCode 0, otherwise non-zero.
 
