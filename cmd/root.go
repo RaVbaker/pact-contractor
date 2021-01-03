@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -35,6 +36,7 @@ import (
 
 var (
 	cfgFile    string
+	silentMode bool
 	bucketName string
 	RegionName string
 )
@@ -69,6 +71,7 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./pacts/.pact-contractor.yaml and $HOME/.pact-contractor.yaml)")
+	rootCmd.PersistentFlags().BoolVarP(&silentMode, "silent", "q", false, "Prevent STDERR to be populated")
 	rootCmd.MarkPersistentFlagFilename("config", "yaml", "yml")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -79,6 +82,11 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	if silentMode {
+		log.SetFlags(0)
+		log.SetOutput(ioutil.Discard)
+	}
+
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
