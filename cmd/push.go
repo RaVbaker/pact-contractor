@@ -40,9 +40,18 @@ var part, numOfParts int
 var pushCmd = &cobra.Command{
 	Use:   "push [path]",
 	Short: "Push generated pact contracts to configured S3 bucket, (default path=\"" + defaultFilesPath + "\")",
-	Long: `Push generated pact contracts, based on path to configured S3 bucket
+	Long: `Push generated pact contracts, based on path to configured S3 bucket.
 
-Default path="` + defaultFilesPath + `", but can be configured until it's in Glob format.`,
+Default path="` + defaultFilesPath + `", but can be configured until it's in Glob format.
+
+E.g. For path like: "pacts/*-*.json" which could represent "pacts/provider-consumer.json" scenario
+and under a branch named: feature-xyz the path for stored S3 object would be:
+"pacts/provider-consumer/feature-xyz.json". So the extension (.json) would stay, the filename (provider-consumer)
+will remain and the tag/branch-name would be added at the very end. Other context details like: author, commitSHA
+and context origin will be persisted in object Metadata (can be accessed with "get" command).
+
+When you're generating your contract in parts, due to complex specs setup you can provide --parts-total and --part
+flags and eventually when all parts will get pushed it will merge it and store under appropriate S3 object.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
 			args = append(args, defaultFilesPath)

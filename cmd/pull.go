@@ -34,9 +34,14 @@ var pullCmd = &cobra.Command{
 	Short: "Pulls pact contracts from configured S3 bucket",
 	Long: `Pulls pact contracts from the bucket by the path.
 
-It fetches it to same directory/folder structure where it was stored with "spec.json" filename at the end
-or ending with "{branch}.json" at the end to perform dynamic branch matching with GitHub Flow (feature-branch,main).
-E.g. 'pull pacts/foo/bar/{branch}.json' command will store a file 'pacts/foo/bar/spec.json'.
+The path is a location of S3 object which base is the tag/git-branch name.
+E.g. File stored under: "./pacts/provider/consumer/spec.json" can be fetched
+for tag/branch: feature-xyz with command: "pull pacts/provider/consumer/spec/feature-xyz.json"
+
+The current branch name can be substituted with "{branch}" so then the command would be:
+"pull pacts/provider/consumer/spec/{branch}.json". When matching dynamic branch is not present
+it uses GitHub Flow (feature-branch,main). Optional --gitflow is also possible to use the develop
+as possible branch name.
 
 The paths can be a list of paths separated by comma and with optional version definition after # sign. Like:
 "paths/foo/bar/test.json#some-v3rsion-1D,paths/foo/baz/{branch}.json#oth3r-v3rsion-1D"
