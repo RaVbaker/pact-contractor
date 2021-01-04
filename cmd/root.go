@@ -52,6 +52,8 @@ var rootCmd = &cobra.Command{
 
 	Allows to pull and push pact contracts to/from an AWS S3 bucket
 	`,
+	SilenceUsage:  true,
+	SilenceErrors: false,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
