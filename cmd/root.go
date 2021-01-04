@@ -38,7 +38,7 @@ var (
 	cfgFile    string
 	silentMode bool
 	bucketName string
-	RegionName string
+	regionName string
 )
 
 const Version = "1.0.0"
@@ -80,7 +80,7 @@ func init() {
 	// when this action is called directly.
 	rootCmd.PersistentFlags().StringVarP(&bucketName, "bucket", "b", "", "AWS S3 Bucket name")
 	rootCmd.MarkPersistentFlagRequired("bucket")
-	rootCmd.PersistentFlags().StringVarP(&RegionName, "region", "r", "us-east-1", "AWS S3 Region name")
+	rootCmd.PersistentFlags().StringVarP(&regionName, "region", "r", "us-east-1", "AWS S3 Region name")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -113,11 +113,11 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		log.Println("Using config file:", viper.ConfigFileUsed())
-		presetRequiredFlags(rootCmd)
-		presetRequiredFlags(pushCmd)
-		presetRequiredFlags(submitCmd)
-		presetRequiredFlags(verifyCmd)
 	}
+	presetRequiredFlags(rootCmd)
+	presetRequiredFlags(pushCmd)
+	presetRequiredFlags(submitCmd)
+	presetRequiredFlags(verifyCmd)
 }
 
 func presetRequiredFlags(cmd *cobra.Command) {

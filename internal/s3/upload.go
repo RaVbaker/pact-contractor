@@ -27,8 +27,10 @@ func Upload(bucket, region, filesPath string, partContext parts.Context, ctx spe
 	}
 
 	if len(files) == 0 {
-		return fmt.Errorf("no files found for path: %q", filesPath)
+		return fmt.Errorf("no files found fo"+
+			"r path: %q", filesPath)
 	}
+	log.Printf("For path %q detected files: %v", filesPath, files)
 	for _, filename := range files {
 		partContext = PrepareMergedFile(partContext, bucket, region, filename, ctx)
 		file, err = fs.OpenFile(filename, os.O_RDONLY, 0400)
@@ -38,6 +40,7 @@ func Upload(bucket, region, filesPath string, partContext parts.Context, ctx spe
 		path := paths.FilenameToPath(filename, partContext, ctx)
 		_, err = upload(client, bucket, path, file, contextsToTagsMap(ctx, partContext))
 		if err != nil {
+			println(err.Error())
 			return
 		}
 	}
