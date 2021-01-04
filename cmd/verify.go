@@ -22,15 +22,10 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
-	"log"
-	"os/exec"
-	"strings"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/ravbaker/pact-contractor/internal/paths"
+	"github.com/ravbaker/pact-contractor/internal/verification"
 )
 
 // verifyCmd represents the verify command
@@ -43,6 +38,7 @@ These steps are:
 1. pulling the contract from S3 by [path]
 2. running a command to verify the contract
 3. submitting the verification status: success/failure
+4. cleanup and remove fetched file
 
 All flags possible for pull & submit are available for the verify command.
 The path from first argument can be substituted in --cmd with "{path}" pattern,
@@ -54,33 +50,9 @@ and any other as "failure".
 If the {branch} pattern is used in the path and the currently provided/examined
 branch doesn't have a contract then the submit of verification will fail`,
 	Args: cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		path, _ := paths.ForBranch(args[0], s3VersionID, gitBranchName)
-
-		err := pullCmd.RunE(cmd, []string{path})
-		if err != nil {
-			log.Fatalf("%v", err)
-		}
-
-		cmdToRun := viper.GetString("cmd")
-
-		const pathPattern = "{path}"
-		filename := paths.PathToFilename(path)
-		cmdToRun = strings.ReplaceAll(cmdToRun, pathPattern, filename)
-
-		runCmd := exec.Command("bash", "-c", cmdToRun)
-		out, err := runCmd.CombinedOutput()
-		verificationStatus := "success"
-		fmt.Printf("Executing command: `%s`\n\n%s\n", cmdToRun, out)
-		if err != nil {
-			verificationStatus = "failure"
-			log.Printf("Command error: %v", err)
-		}
-
-		err = submitCmd.RunE(cmd, []string{path, verificationStatus})
-		if err != nil {
-			log.Fatalf("%v", err)
-		}
+	RunE: func(cmd *cobra.Command, args []string) error {
+		path := args[0]
+		return verification.Run(viper.GetString("cmd"), path, s3VersionID, gitBranchName, cmd, pullCmd, submitCmd)
 	},
 }
 

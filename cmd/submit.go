@@ -40,7 +40,7 @@ Rules for [paths] are same as for pull command, so they can contain the S3Object
 Optional fields about provider can be set with flags.`,
 	Args: cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := verification.PublishVerification(viper.GetString("bucket"), viper.GetString("region"), args[0], args[1], verifiedS3VersionID, providerVersion, providerContext)
+		err := verification.Publish(viper.GetString("bucket"), viper.GetString("region"), args[0], args[1], verifiedS3VersionID, providerVersion, providerContext)
 		return err
 	},
 }
