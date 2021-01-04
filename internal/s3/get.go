@@ -2,6 +2,7 @@ package s3
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -9,11 +10,13 @@ import (
 
 func Get(bucket, region, path, versionID string) (fields map[string]*string, err error) {
 	client := NewClient(region)
-	fields, versionID, err = GetMetadata(client, bucket, path, versionID)
+	var lastModified *time.Time
+	fields, versionID, lastModified, err = GetMetadata(client, bucket, path, versionID)
 	if err != nil {
 		return nil, err
 	}
 	fields["VersionID"] = &versionID
+	fields["Last Modified"] = aws.String(lastModified.Format(time.RFC3339))
 
 	tagDetails, err := client.GetObjectTagging(&s3.GetObjectTaggingInput{
 		Bucket:    aws.String(bucket),
@@ -32,7 +35,7 @@ func Get(bucket, region, path, versionID string) (fields map[string]*string, err
 	return fields, nil
 }
 
-func GetMetadata(client *s3.S3, bucket, path string, versionID string) (map[string]*string, string, error) {
+func GetMetadata(client *s3.S3, bucket, path string, versionID string) (map[string]*string, string, *time.Time, error) {
 	object, err := client.HeadObject(&s3.HeadObjectInput{
 		Bucket:    aws.String(bucket),
 		Key:       aws.String(path),
@@ -40,8 +43,8 @@ func GetMetadata(client *s3.S3, bucket, path string, versionID string) (map[stri
 	})
 
 	if err != nil {
-		return nil, "", fmt.Errorf("cannot fetch metadata for %q#%s from bucket %s, %w", path, versionID, bucket, err)
+		return nil, "", nil, fmt.Errorf("cannot fetch metadata for %q#%s from bucket %s, %w", path, versionID, bucket, err)
 	}
 
-	return object.Metadata, *object.VersionId, err
+	return object.Metadata, *object.VersionId, object.LastModified, err
 }

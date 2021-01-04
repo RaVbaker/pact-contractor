@@ -15,6 +15,8 @@ import (
 	"github.com/ravbaker/pact-contractor/internal/speccontext"
 )
 
+const applicationJSON = "application/json"
+
 func Upload(bucket, region, filesPath string, partContext parts.Context, ctx speccontext.GitContext) (err error) {
 	var files []string
 	var file afero.File
@@ -96,7 +98,8 @@ func upload(client s3iface.S3API, bucket, path string, file afero.File, metadata
 		// each part.
 		Body: file,
 
-		Metadata: metadata,
+		Metadata:    metadata,
+		ContentType: aws.String(applicationJSON),
 	})
 	if err != nil {
 		// Print the error and exit.

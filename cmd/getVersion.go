@@ -45,7 +45,7 @@ Use --silent/-q mode to nto print any logs.`,
 		path, s3VersionID = paths.ForBranch(args[0], s3VersionID, "")
 		bucket := viper.GetString("bucket")
 		regionName := viper.GetString("region")
-		_, versionID, err := s3.GetMetadata(s3.NewClient(regionName), bucket, path, s3VersionID)
+		_, versionID, _, err := s3.GetMetadata(s3.NewClient(regionName), bucket, path, s3VersionID)
 		if err != nil {
 			log.Fatalf("Cannot get Object %q#%s from bucket %q versionID, error: %v", path, s3VersionID, bucket, err)
 		}
