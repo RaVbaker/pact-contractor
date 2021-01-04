@@ -30,8 +30,9 @@ func CheckStatus(bucket, region, pathsArg, versionID, gitBranchName, expectedPro
 	fmt.Printf("Examinating path: %q, version ID: %q\n\n", path, versionID)
 
 	for key, value := range fields {
-		fmt.Printf("%s:\t%q\n", key, *value)
+		fmt.Printf("%s: %q\n", key, *value)
 	}
+	versionID = *fields["VersionID"]
 
 	if err != nil {
 		return fmt.Errorf("couldn't fetch path details, %w", err)
