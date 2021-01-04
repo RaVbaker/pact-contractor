@@ -3,6 +3,7 @@ package verification
 import (
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -25,11 +26,13 @@ func Run(cmdToRun, path, s3VersionID, gitBranchName string, cmd, pullCmd, submit
 	filename := paths.PathToFilename(path)
 	cmdToRun = strings.ReplaceAll(cmdToRun, pathPattern, filename)
 
+	fmt.Printf("Executing command: `%s`\n\n", cmdToRun)
 	runCmd := exec.Command("bash", "-c", cmdToRun)
-	var out []byte
-	out, err = runCmd.CombinedOutput()
+	runCmd.Stdout = os.Stdout
+	runCmd.Stderr = os.Stderr
+	err = runCmd.Run()
+
 	verificationStatus := "success"
-	fmt.Printf("Executing command: `%s`\n\n%s\n", cmdToRun, out)
 	if err != nil {
 		verificationStatus = "failure"
 		log.Printf("Command error: %v", err)
