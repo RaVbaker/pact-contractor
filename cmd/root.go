@@ -41,10 +41,13 @@ var (
 	RegionName string
 )
 
+const Version = "1.0.0"
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "pact-contractor",
-	Short: "Pact Broker alternative based on top of AWS S3 storage",
+	Version: Version,
+	Use:     "pact-contractor",
+	Short:   "Pact Broker alternative based on top of AWS S3 storage",
 	Long: `PactContractor - Pact Broker alternative based on top of AWS S3 storage
 
 	Allows to pull and push pact contracts to/from an AWS S3 bucket
@@ -104,6 +107,7 @@ func initConfig() {
 		viper.SetConfigName(".pact-contractor")
 	}
 
+	viper.SetEnvPrefix("pact")
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
