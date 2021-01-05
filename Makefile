@@ -9,6 +9,11 @@ build:
 run:
 	go run main.go $(cmd)
 
+release:
+	git tag -a $(VERSION)
+	git push origin $(VERSION)
+	goreleaser
+
 .PHONY: help
 all: help
 help: Makefile
