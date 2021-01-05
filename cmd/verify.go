@@ -45,10 +45,7 @@ The path from first argument can be substituted in --cmd with "{path}" pattern,
 which default value is for Ruby "bundle exec rake pact:verify:at[{path}]".
 But feel free to set the "cmd" in config file for convenience.
 Submitted status is detected from exitCode and 0 is interpreted as "success"
-and any other as "failure".
-
-If the {branch} pattern is used in the path and the currently provided/examined
-branch doesn't have a contract then the submit of verification will fail`,
+and any other as "failure".`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		path := args[0]

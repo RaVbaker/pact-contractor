@@ -47,7 +47,7 @@ func gitBranchPaths(pattern, branchName string, gitFlow bool) (paths []string) {
 	if branchName == "" {
 		branchName = speccontext.CurrentBranchName()
 	}
-	if branchName != "" {
+	if branchName != "" && branchName != speccontext.DefaultSpecTag {
 		paths = append(paths, fmt.Sprintf(pattern, branchName))
 	}
 	if gitFlow {

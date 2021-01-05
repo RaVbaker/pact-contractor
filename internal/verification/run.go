@@ -15,13 +15,28 @@ import (
 
 const pathPattern = "{path}"
 
-func Run(cmdToRun, path, s3VersionID, gitBranchName string, cmd, pullCmd, submitCmd *cobra.Command) error {
-	path, _ = paths.ForBranch(path, s3VersionID, gitBranchName)
+func Run(cmdToRun, pathsArg, s3VersionID, gitBranchName string, cmd, pullCmd, submitCmd *cobra.Command) (err error) {
+	var path string
+	list := paths.Extract(pathsArg, s3VersionID)
+	for pathNoVersionId, version := range list {
+		potentialPaths := paths.Resolve(pathNoVersionId, gitBranchName, false)
+		for _, potentialPath := range potentialPaths {
+			pullCmd.Flag("version").Value.Set(version)
+			err = pullCmd.RunE(cmd, []string{potentialPath})
+			if err == nil {
+				path = potentialPath
+				s3VersionID = version
+				break
+			}
+		}
+		break
+	}
 
-	err := pullCmd.RunE(cmd, []string{path})
-	if err != nil {
+	if err != nil && len(path) == 0 {
 		return err
 	}
+
+	// path, _ = paths.ForBranch(pathsArg, s3VersionID, gitBranchName)
 
 	filename := paths.PathToFilename(path)
 	cmdToRun = strings.ReplaceAll(cmdToRun, pathPattern, filename)

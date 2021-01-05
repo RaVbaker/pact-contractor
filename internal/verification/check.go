@@ -40,7 +40,7 @@ func CheckStatus(bucket, region, pathsArg, versionID, gitBranchName, expectedPro
 
 	providerVersionField, ok := fields["Provider Version"]
 	if len(expectedProviderVersion) > 0 && ok && *providerVersionField != expectedProviderVersion {
-		return fmt.Errorf("provider version mismatch, field %q != %q", providerVersionField, expectedProviderVersion)
+		return fmt.Errorf("provider version mismatch, field %q != %q", *providerVersionField, expectedProviderVersion)
 	}
 
 	verifiedStatus, ok := fields["Pact Verification"]
@@ -48,7 +48,7 @@ func CheckStatus(bucket, region, pathsArg, versionID, gitBranchName, expectedPro
 	if !ok {
 		return fmt.Errorf("no verification status found for %q#%s", path, versionID)
 	} else if *verifiedStatus != "success" {
-		return fmt.Errorf("unsuccessful verification, current status: %q", verifiedStatus)
+		return fmt.Errorf("unsuccessful verification, current status: %q", *verifiedStatus)
 	}
 	return nil
 }
