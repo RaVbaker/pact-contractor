@@ -10,9 +10,9 @@ run:
 	go run main.go $(cmd)
 
 release:
-	rm -rf dist
 	git tag -a $(VERSION)
 	git push origin $(VERSION)
+	goreleaser --rm-dist
 
 .PHONY: help
 all: help
