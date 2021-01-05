@@ -9,6 +9,7 @@ build:
 run:
 	go run main.go $(cmd)
 
+## release: Releases new version of the binary and submits to GitHub. Remember to have the GITHUB_TOKEN env var present. Provide VERSION to set the released version. E.g. make release VERSION=v0.1.1
 release:
 	git tag -a $(VERSION)
 	git push origin $(VERSION)
