@@ -74,7 +74,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./pacts/.pact-contractor.yaml and $HOME/.pact-contractor.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./(spec/)?pacts/.pact-contractor.yaml and $HOME/.pact-contractor.yaml)")
 	rootCmd.PersistentFlags().BoolVarP(&silentMode, "silent", "q", false, "Prevent STDERR to be populated")
 	rootCmd.MarkPersistentFlagFilename("config", "yaml", "yml")
 	// Cobra also supports local flags, which will only run
@@ -103,6 +103,7 @@ func initConfig() {
 		}
 
 		// Search config in home or local pacts directory with name ".pact-contractor" (without extension).
+		viper.AddConfigPath("spec/pacts")
 		viper.AddConfigPath("pacts")
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".pact-contractor")

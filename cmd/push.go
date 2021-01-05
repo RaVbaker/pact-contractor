@@ -32,7 +32,7 @@ import (
 	"github.com/ravbaker/pact-contractor/internal/speccontext"
 )
 
-const defaultFilesPath = "pacts/*/*/spec.json"
+const defaultFilesPath = "pacts/*-*.json"
 
 var specTag, contextOrigin, gitAuthor, gitBranch, gitCommitSHA string
 var part, numOfParts int
