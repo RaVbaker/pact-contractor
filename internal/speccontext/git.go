@@ -100,13 +100,23 @@ func findReferenceFromCommitSHA(r *git.Repository, commitSHA string) (*plumbing.
 	refs, _ := r.References()
 	var ref *plumbing.Reference
 	err = refs.ForEach(func(iterRef *plumbing.Reference) error {
-		if iterRef.Hash() == *hash {
+		if iterRef != nil && iterRef.Hash() == *hash {
 			ref = iterRef
 			refs.Close()
 			return nil
 		}
-		return fmt.Errorf("reference %s not found when iterating", commitSHA)
+		return nil
 	})
+
+	if err != nil {
+		return nil, fmt.Errorf("reference %s not found when iterating, %w", commitSHA, err)
+	}
+
+	if ref == nil {
+		log.Printf("Couldn't find reference for %q, expanded hash to: %q, use --git-branch to overwrite branch", commitSHA, hash.String())
+		ref = plumbing.NewReferenceFromStrings("-branch-not-found-", hash.String())
+	}
+
 	return ref, err
 }
 
