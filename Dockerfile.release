@@ -1,0 +1,13 @@
+FROM alpine
+
+RUN apk add --no-cache bash \
+                       curl \
+                       docker-cli \
+                       git \
+                       make \
+                       build-base
+
+ENTRYPOINT ["/bin/pact-contractor"]
+CMD [ "-h" ]
+
+COPY pact-contractor /bin/pact-contractor

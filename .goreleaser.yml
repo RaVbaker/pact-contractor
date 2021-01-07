@@ -6,6 +6,20 @@ before:
     - go mod download
     # you may remove this if you don't need go generate
     - go generate ./...
+dockers:
+  - image_templates:
+    - 'ravbaker/{{ .ProjectName}}:{{ .Tag }}'
+    dockerfile: Dockerfile.release
+    binaries:
+    - pact-contractor
+    build_flag_templates:
+    - "--pull"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.name={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+    - "--label=org.opencontainers.image.source={{.GitURL}}"
+    - "--platform=linux/amd64"
 builds:
   - env:
       - CGO_ENABLED=0
