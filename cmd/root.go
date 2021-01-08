@@ -33,6 +33,8 @@ import (
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
+
+	"github.com/ravbaker/pact-contractor/internal/hooks"
 )
 
 var (
@@ -119,6 +121,7 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		log.Println("Using config file:", viper.ConfigFileUsed())
+		hooks.Parse()
 	}
 	presetRequiredFlags(rootCmd)
 	presetRequiredFlags(pushCmd)

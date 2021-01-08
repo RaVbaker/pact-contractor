@@ -58,7 +58,8 @@ flags and eventually when all parts will get pushed it will merge it and store u
 		}
 		partsScope := parts.NewScope(part, numOfParts)
 		ctx := speccontext.NewGitContext(specTag, contextOrigin, gitAuthor, gitBranch, gitCommitSHA)
-		err := s3.Upload(viper.GetString("bucket"), viper.GetString("region"), args[0], partsScope, ctx)
+		path := args[0]
+		err := s3.Upload(viper.GetString("bucket"), viper.GetString("region"), path, partsScope, ctx)
 		if err != nil {
 			log.Fatalf("%v\n", err)
 		}

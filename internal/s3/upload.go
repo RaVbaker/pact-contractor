@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/spf13/afero"
 
+	"github.com/ravbaker/pact-contractor/internal/hooks"
 	"github.com/ravbaker/pact-contractor/internal/parts"
 	"github.com/ravbaker/pact-contractor/internal/paths"
 	"github.com/ravbaker/pact-contractor/internal/speccontext"
@@ -45,6 +46,7 @@ func Upload(bucket, region, filesPath string, partContext parts.Context, ctx spe
 			println(err.Error())
 			return
 		}
+		hooks.Runner(path, filename, ctx, partContext)
 	}
 	return
 }

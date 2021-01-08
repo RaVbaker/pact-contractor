@@ -21,7 +21,7 @@ In the future, it should also help in configuration of a "hook" that could run e
 6. Pulling of the contracts should allow some dynamic specTag detection.
 7. Pulling is allows to download multiple files at once, when paths are separated by comma, version can be then provided after # sign in path. E.g. "paths/foo/bar/test.json#some-v3rsion-1D,paths/foo/baz/{branch}.json#oth3r-v3rsion-1D" 
 8. There can be 3 "hook" modes. [@TODO] in version 1.1.0
-    * Local - runs verification on provider immediately after `push` (might require extra configuration in `config.yaml`).
+    * Local - runs arbitrary code immediately after `push` (might require extra configuration in `config.yaml`).
     * AWS Lambda - that is based on S3 hooks executed when new file is uploaded/updated. The tool helps in marking the status of verification which is stored in S3 Object Tags and setting up the Lambdas in AWS.
     * GitHub Actions - similar to Local but runs the code/verification using GitHub Action. Also here it is planned to support such setup also on preparation part.
 9. Contracts deep-merge might be needed if existing version of contract is defined as same commitsha. Especially in usecase like we have with split build runs.
@@ -50,7 +50,7 @@ Configuration flags are:
 The `bucket` and `region` can be also configured in the config file. Either globally or provided with `--config` flag when executed.
 
 You can also provide AWS variables with in the file for values like:
-`AWS_PROFILE, AWS_ACCESS_KEY, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN, AWS_CONFIG_FILE, AWS_SHARED_CREDENTIALS_FILE, AWS_ROLE_ARN, AWS_CA_BUNDLE, AWS_REGION, AWS_DEFAULT_REGION, AWS_SDK_LOAD_CONFIG`. Or provide prefixed with `PACT_` values so they will be overwritten for the run of the pact-contractor app only. 
+`AWS_PROFILE, AWS_ACCESS_KEY, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN, AWS_CONFIG_FILE, AWS_SHARED_CREDENTIALS_FILE, AWS_ROLE_ARN, AWS_CA_BUNDLE, AWS_REGION, AWS_DEFAULT_REGION, AWS_SDK_LOAD_CONFIG`. Or provide prefixed with `PACT_` values so they will be overwritten for the run of the pact-contractor app only.
 
 The file sample (`~/config.yaml`):
 ```yaml
@@ -58,6 +58,11 @@ The file sample (`~/config.yaml`):
 aws_region: us-east-1
 bucket: mybucket
 cmd: echo "{path}" && bundle exec rake pact:verify:at[{path}]
+hooks:
+- type: local
+  path_filter: pacts/*/*.json
+  spec:
+     command: echo "foo {path} OK"
 ```
 
 ## Makefile
