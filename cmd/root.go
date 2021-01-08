@@ -85,7 +85,7 @@ func init() {
 	// when this action is called directly.
 	rootCmd.PersistentFlags().StringVarP(&bucketName, "bucket", "b", "", "AWS S3 Bucket name")
 	rootCmd.MarkPersistentFlagRequired("bucket")
-	rootCmd.PersistentFlags().StringVarP(&regionName, "region", "r", "us-east-1", "AWS S3 Region name")
+	rootCmd.PersistentFlags().StringVarP(&regionName, "region", "r", "", "AWS S3 Region name")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -139,6 +139,9 @@ func loadAWSCredentialsToEnv() {
 	viper.BindEnv("AWS_SHARED_CREDENTIALS_FILE")
 	viper.BindEnv("AWS_ROLE_ARN")
 	viper.BindEnv("AWS_CA_BUNDLE")
+	viper.BindEnv("AWS_REGION")
+	viper.BindEnv("AWS_DEFAULT_REGION")
+	viper.BindEnv("AWS_SDK_LOAD_CONFIG")
 
 	for _, key := range viper.AllKeys() {
 		value := strings.TrimSpace(viper.GetString(key))

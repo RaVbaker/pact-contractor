@@ -43,19 +43,19 @@ The `--help` flag says even more about every command.
 Configuration flags are: 
 
 * `-b, --bucket string`   AWS S3 Bucket name
-* `-r, --region string`   AWS S3 Region name (default "us-east-1")
+* `-r, --region string`   AWS S3 Region name (default from `$AWS_REGION` env variable)
 * `--config string`   config file (default is $HOME/.pact-contractor.yaml)
 * `--cmd string`  Command to execute during verification, {path} is replaced with provided [path]. (default `"bundle exec rake pact:verify:at[{path}]"`)
 
 The `bucket` and `region` can be also configured in the config file. Either globally or provided with `--config` flag when executed.
 
 You can also provide AWS variables with in the file for values like:
-`AWS_PROFILE, AWS_ACCESS_KEY, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN, AWS_CONFIG_FILE, AWS_SHARED_CREDENTIALS_FILE, AWS_ROLE_ARN, AWS_CA_BUNDLE`. Or provide prefixed with `PACT_` values so they will be overwritten for the run of the pact-contractor app only. 
+`AWS_PROFILE, AWS_ACCESS_KEY, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN, AWS_CONFIG_FILE, AWS_SHARED_CREDENTIALS_FILE, AWS_ROLE_ARN, AWS_CA_BUNDLE, AWS_REGION, AWS_DEFAULT_REGION, AWS_SDK_LOAD_CONFIG`. Or provide prefixed with `PACT_` values so they will be overwritten for the run of the pact-contractor app only. 
 
 The file sample (`~/config.yaml`):
 ```yaml
 ---
-region: us-east-1
+aws_region: us-east-1
 bucket: mybucket
 cmd: echo "{path}" && bundle exec rake pact:verify:at[{path}]
 ```

@@ -17,7 +17,7 @@ func NewClient(region string) *s3.S3 {
 	// Initialize a session in us-west-2 that the SDK will use to load
 	// credentials from the shared credentials file ~/.aws/credentials.
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(region)},
+		Region: optionalAWSString(region)},
 	))
 
 	svc := s3.New(sess)
