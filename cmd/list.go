@@ -34,12 +34,12 @@ var listCmd = &cobra.Command{
 	Use:   "list [path]",
 	Short: "List contracts for a given path",
 	Long:  `List contracts for a given path (in a valid Glob format), sorted descending by creation date`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			args = append(args, defaultFilesPath)
 		}
 
-		s3.List(viper.GetString("bucket"), viper.GetString("region"), args[0], specTag)
+		return s3.List(viper.GetString("bucket"), viper.GetString("region"), args[0], specTag)
 	},
 }
 
