@@ -26,6 +26,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -123,6 +124,29 @@ func initConfig() {
 	presetRequiredFlags(pushCmd)
 	presetRequiredFlags(submitCmd)
 	presetRequiredFlags(verifyCmd)
+	loadAWSCredentialsToEnv()
+}
+
+func loadAWSCredentialsToEnv() {
+	// bind AWS env vars
+	viper.BindEnv("AWS_PROFILE")
+	viper.BindEnv("AWS_ACCESS_KEY")
+	viper.BindEnv("AWS_ACCESS_KEY_ID")
+	viper.BindEnv("AWS_SECRET_KEY")
+	viper.BindEnv("AWS_SECRET_ACCESS_KEY")
+	viper.BindEnv("AWS_SESSION_TOKEN")
+	viper.BindEnv("AWS_CONFIG_FILE")
+	viper.BindEnv("AWS_SHARED_CREDENTIALS_FILE")
+	viper.BindEnv("AWS_ROLE_ARN")
+	viper.BindEnv("AWS_CA_BUNDLE")
+
+	for _, key := range viper.AllKeys() {
+		value := strings.TrimSpace(viper.GetString(key))
+		if strings.HasPrefix(key, "aws_") && len(value) > 0 {
+			envKey := strings.ToUpper(key)
+			os.Setenv(envKey, value)
+		}
+	}
 }
 
 func presetRequiredFlags(cmd *cobra.Command) {

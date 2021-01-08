@@ -49,6 +49,9 @@ Configuration flags are:
 
 The `bucket` and `region` can be also configured in the config file. Either globally or provided with `--config` flag when executed.
 
+You can also provide AWS variables with in the file for values like:
+`AWS_PROFILE, AWS_ACCESS_KEY, AWS_ACCESS_KEY_ID, AWS_SECRET_KEY, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN, AWS_CONFIG_FILE, AWS_SHARED_CREDENTIALS_FILE, AWS_ROLE_ARN, AWS_CA_BUNDLE`. Or provide prefixed with `PACT_` values so they will be overwritten for the run of the pact-contractor app only. 
+
 The file sample (`~/config.yaml`):
 ```yaml
 ---
