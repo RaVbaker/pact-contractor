@@ -32,11 +32,12 @@ func CheckStatus(bucket, region, pathsArg, versionID, gitBranchName, expectedPro
 	for key, value := range fields {
 		fmt.Printf("%s: %q\n", key, *value)
 	}
-	versionID = *fields["VersionID"]
 
 	if err != nil {
 		return fmt.Errorf("couldn't fetch path details, %w", err)
 	}
+
+	versionID = *fields["VersionID"]
 
 	providerVersionField, ok := fields["Provider Version"]
 	if len(expectedProviderVersion) > 0 && ok && *providerVersionField != expectedProviderVersion {

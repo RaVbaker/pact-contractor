@@ -57,7 +57,7 @@ func download(bucket, region, path, s3VersionID, filename string, file afero.Fil
 	// Initialize a session in us-west-2 that the SDK will use to load
 	// credentials from the shared credentials file ~/.aws/credentials.
 	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String(region)},
+		Region: optionalAWSString(region)},
 	)
 
 	// Setup the S3 Upload Manager. Also see the SDK doc for the Upload Manager
