@@ -47,14 +47,21 @@ var debugCmd = &cobra.Command{
 		fmt.Println("Lists AWS environment variables found in app config:")
 		for _, key := range viper.AllKeys() {
 			if strings.HasPrefix(key, "aws_") {
-				fmt.Printf("%q = %q\n", key, viper.GetString(key))
+				safeValue := viper.GetString(key)
+				if strings.Contains(key, "secret") {
+					safeValue = "<SECRET>"
+				}
+				fmt.Printf("%q = %q\n", key, safeValue)
 			}
 		}
 
 		fmt.Println("Lists AWS environment variables found globally:")
-		for _, key := range os.Environ() {
-			if strings.HasPrefix(key, "AWS_") {
-				fmt.Printf("%q\n", key)
+		for _, keyAndValue := range os.Environ() {
+			if strings.HasPrefix(keyAndValue, "AWS_") {
+				if strings.Contains(keyAndValue, "SECRET") {
+					keyAndValue = strings.Split(keyAndValue, "=")[0] + "=<SECRET>"
+				}
+				fmt.Printf("%q\n", keyAndValue)
 			}
 		}
 		session := s3.NewSession(regionName, true)
