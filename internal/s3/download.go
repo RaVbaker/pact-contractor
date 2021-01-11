@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/spf13/afero"
@@ -54,17 +53,13 @@ func downloadPath(bucket string, region string, path string, s3VersionID string,
 }
 
 func download(bucket, region, path, s3VersionID, filename string, file afero.File) bool {
-	// Initialize a session in us-west-2 that the SDK will use to load
-	// credentials from the shared credentials file ~/.aws/credentials.
-	sess, err := session.NewSession(&aws.Config{
-		Region: optionalAWSString(region)},
-	)
+	client := NewClient(region)
 
 	// Setup the S3 Upload Manager. Also see the SDK doc for the Upload Manager
 	// for more information on configuring part size, and concurrency.
 	//
 	// http://docs.aws.amazon.com/sdk-for-go/api/service/s3/s3manager/#NewUploader
-	downloader := s3manager.NewDownloader(sess)
+	downloader := s3manager.NewDownloaderWithClient(client)
 
 	// Write the contents of S3 Object to the file
 	n, err := downloader.Download(file, &s3.GetObjectInput{

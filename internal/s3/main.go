@@ -1,6 +1,8 @@
 package s3
 
 import (
+	"log"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -34,6 +36,7 @@ func NewSession(region string, debug bool) *session.Session {
 func ClientConfig(region, assumeRoleArn string, sess *session.Session) *aws.Config {
 	config := &aws.Config{Region: optionalAWSString(region)}
 	if len(assumeRoleArn) > 0 {
+		log.Printf("AWS Client with Assumed Role: %q", assumeRoleArn)
 		credentials := stscreds.NewCredentials(sess, assumeRoleArn)
 		return config.WithCredentials(credentials)
 	}
