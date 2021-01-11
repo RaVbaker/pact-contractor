@@ -88,6 +88,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&bucketName, "bucket", "b", "", "AWS S3 Bucket name")
 	rootCmd.MarkPersistentFlagRequired("bucket")
 	rootCmd.PersistentFlags().StringVarP(&regionName, "region", "r", "", "AWS S3 Region name")
+	rootCmd.PersistentFlags().String("aws_assume_role_arn", "", "AWS AssumeRole ARN")
 }
 
 // initConfig reads in config file and ENV variables if set.

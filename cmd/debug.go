@@ -65,8 +65,9 @@ var debugCmd = &cobra.Command{
 			}
 		}
 		session := s3.NewSession(regionName, true)
+		awsConfig := s3.ClientConfig(regionName, viper.GetString("aws_assume_role_arn"), session)
 
-		client := sts.New(session)
+		client := sts.New(session, awsConfig)
 		result, err := client.GetCallerIdentity(&sts.GetCallerIdentityInput{})
 		if err != nil {
 			fmt.Println("Failed to get identity:")
