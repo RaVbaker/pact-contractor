@@ -10,10 +10,9 @@ import (
 func Publish(bucket, region, pathsArg, status, s3VersionID, providerVersion, providerContext string) (err error) {
 	list := paths.Extract(pathsArg, s3VersionID)
 	tags := tagsList(status, providerVersion, providerContext)
-
+	client := s3.NewClient(region)
 	for path, version := range list {
-
-		err = s3.Tag(s3.NewClient(region), bucket, path, version, tags)
+		err = s3.Tag(client, bucket, path, version, tags)
 		if err != nil {
 			return
 		}

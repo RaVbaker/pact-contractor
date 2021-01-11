@@ -20,10 +20,11 @@ In the future, it should also help in configuration of a "hook" that could run e
 5. Config file can be kept not only globally per-user in $HOMEDIR but also in local `pacts/` directory and interfered if present.
 6. Pulling of the contracts should allow some dynamic specTag detection.
 7. Pulling is allows to download multiple files at once, when paths are separated by comma, version can be then provided after # sign in path. E.g. "paths/foo/bar/test.json#some-v3rsion-1D,paths/foo/baz/{branch}.json#oth3r-v3rsion-1D" 
-8. There can be 3 "hook" modes. [@TODO] in version 1.1.0
+8. There can be 4 "hook" modes. [@TODO] in version 1.1.0
     * Local - runs arbitrary code immediately after `push` (might require extra configuration in `config.yaml`).
     * AWS Lambda - that is based on S3 hooks executed when new file is uploaded/updated. The tool helps in marking the status of verification which is stored in S3 Object Tags and setting up the Lambdas in AWS.
     * GitHub Actions - similar to Local but runs the code/verification using GitHub Action. Also here it is planned to support such setup also on preparation part.
+    * HTTP hook - calls an HTTP endpoint in a specified way: with headers, params and a payload.   
 9. Contracts deep-merge might be needed if existing version of contract is defined as same commitsha. Especially in usecase like we have with split build runs.
 10. `verify [path]` helper command that accepts as argument a command to run for verification and does the `pull [path]` & `submit [path] [verification-status]` around it.
 11. `can-i-deploy` checks verification status on a path#version and prints details of the object and verification.

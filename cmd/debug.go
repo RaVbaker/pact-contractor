@@ -48,7 +48,7 @@ var debugCmd = &cobra.Command{
 		for _, key := range viper.AllKeys() {
 			if strings.HasPrefix(key, "aws_") {
 				safeValue := viper.GetString(key)
-				if strings.Contains(key, "secret") {
+				if strings.Contains(key, "secret") && len(safeValue) > 0 {
 					safeValue = "<SECRET>"
 				}
 				fmt.Printf("%q = %q\n", key, safeValue)
