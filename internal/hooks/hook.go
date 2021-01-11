@@ -2,6 +2,7 @@ package hooks
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -49,6 +50,7 @@ type LocalHook struct {
 
 func (l *LocalHook) Run(path string) error {
 	cmd := strings.ReplaceAll(l.Command, "{path}", path)
+	cmd = os.ExpandEnv(cmd)
 	fmt.Printf("> %s\n", cmd)
 	out, err := exec.Command("bash", "-c", cmd).CombinedOutput()
 	if err != nil {
