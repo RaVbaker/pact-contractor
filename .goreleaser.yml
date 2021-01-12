@@ -9,6 +9,7 @@ before:
 dockers:
   - image_templates:
     - 'ravbaker/{{ .ProjectName}}:{{ .Tag }}'
+    - "ravbaker/{{ .ProjectName}}:latest"
     dockerfile: Dockerfile.release
     binaries:
     - pact-contractor
