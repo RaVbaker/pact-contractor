@@ -33,6 +33,9 @@ func NewGitContext(specTag, origin, author, branch, commitSHA string) GitContext
 	if len(branch) != 0 {
 		gitContext.Branch = normalizeBranchName(branch)
 	}
+	if len(commitSHA) > 0 && len(gitContext.CommitSHA) == 0 {
+		gitContext.CommitSHA = commitSHA
+	}
 	if specTag == BranchSpecTag {
 		if len(gitContext.Branch) != 0 {
 			specTag = gitContext.Branch
