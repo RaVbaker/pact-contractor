@@ -1,9 +1,6 @@
 package hooks
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -36,26 +33,4 @@ func (h *Hook) Definition() Spec {
 		return &localSpec
 	}
 	return &NoopHook{}
-}
-
-type NoopHook struct{}
-
-func (n NoopHook) Run(_ string) error {
-	return nil
-}
-
-type LocalHook struct {
-	Command string
-}
-
-func (l *LocalHook) Run(path string) error {
-	cmd := strings.ReplaceAll(l.Command, "{path}", path)
-	cmd = os.ExpandEnv(cmd)
-	fmt.Printf("> %s\n", cmd)
-	out, err := exec.Command("bash", "-c", cmd).CombinedOutput()
-	if err != nil {
-		return err
-	}
-	fmt.Println(string(out))
-	return nil
 }
