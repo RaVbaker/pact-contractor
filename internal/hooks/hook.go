@@ -104,6 +104,15 @@ func (h *Hook) Definition() Spec {
 		var localSpec LocalHook
 		mapstructure.Decode(h.Spec, &localSpec)
 		return &localSpec
+	case "http":
+		var httpSpec HttpHook
+		mapstructure.Decode(h.Spec, &httpSpec)
+		return &httpSpec
 	}
 	return &NoopHook{}
+}
+
+func templateString(path, template string) string {
+	template = strings.ReplaceAll(template, "{path}", path)
+	return os.ExpandEnv(template)
 }

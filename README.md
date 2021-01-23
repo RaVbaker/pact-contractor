@@ -64,6 +64,15 @@ hooks:
   path_filter: pacts/*/*.json
   spec:
      command: echo "foo {path} OK"
+- type: http
+  spec:
+     method: POST
+     url: https://httpbin.org/post
+     body: |
+        { "a" : "{path}", "b": "${USER}" }
+     headers:
+        x-header: "42"
+        content-type: application/json
 ```
 
 ## Makefile
