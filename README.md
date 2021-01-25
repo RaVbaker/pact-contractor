@@ -73,6 +73,13 @@ hooks:
      headers:
         x-header: "42"
         content-type: application/json
+- type: aws_lambda
+  require_env:
+  - USER=ravbaker
+  spec:
+     function_name: "${USER}-lambda-run"
+     region: "us-east-1"
+     payload: "{}"
 ```
 
 ## Makefile
