@@ -75,11 +75,15 @@ func init() {
 	// and all subcommands, e.g.:
 	// pushCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	pushCmd.Flags().IntVar(&part, "part", 0, "When provided as non-zero indicates the part which was pushed")
-	pushCmd.Flags().IntVar(&numOfParts, "parts-total", 0, "When provided as non-zero indicates how many parts should be submitted, when all then it merges contract into a single file")
-	pushCmd.Flags().StringVarP(&specTag, "tag", "t", speccontext.BranchSpecTag, "Provides the tag under which the specification is stored, if '"+speccontext.BranchSpecTag+"' uses Git current branch name")
-	pushCmd.Flags().StringVarP(&contextOrigin, "context", "o", "", "Provides optional context origin (e.g. Build identifier or URL) value stored with S3 Object metadata")
-	pushCmd.Flags().StringVar(&gitAuthor, "git-author", "", "Provides the git commit author name")
-	pushCmd.Flags().StringVar(&gitBranch, "git-branch", "", "Provides the git current branch name")
-	pushCmd.Flags().StringVar(&gitCommitSHA, "git-commit-sha", "", "Provides the git commit SHA reference, if provided can be an origin of author/branch name")
+	pushCmdFlagsSetup(pushCmd)
+}
+
+func pushCmdFlagsSetup(cmd *cobra.Command) {
+	cmd.Flags().IntVar(&part, "part", 0, "When provided as non-zero indicates the part which was pushed")
+	cmd.Flags().IntVar(&numOfParts, "parts-total", 0, "When provided as non-zero indicates how many parts should be submitted, when all then it merges contract into a single file")
+	cmd.Flags().StringVarP(&specTag, "tag", "t", speccontext.BranchSpecTag, "Provides the tag under which the specification is stored, if '"+speccontext.BranchSpecTag+"' uses Git current branch name")
+	cmd.Flags().StringVarP(&contextOrigin, "context", "o", "", "Provides optional context origin (e.g. Build identifier or URL) value stored with S3 Object metadata")
+	cmd.Flags().StringVar(&gitAuthor, "git-author", "", "Provides the git commit author name")
+	cmd.Flags().StringVar(&gitBranch, "git-branch", "", "Provides the git current branch name")
+	cmd.Flags().StringVar(&gitCommitSHA, "git-commit-sha", "", "Provides the git commit SHA reference, if provided can be an origin of author/branch name")
 }

@@ -108,6 +108,10 @@ func (h *Hook) Definition() Spec {
 		var httpSpec HttpHook
 		mapstructure.Decode(h.Spec, &httpSpec)
 		return &httpSpec
+	case "aws_lambda":
+		var lambdaHook AWSLambdaHook
+		mapstructure.Decode(h.Spec, &lambdaHook)
+		return &lambdaHook
 	}
 	return &NoopHook{}
 }
