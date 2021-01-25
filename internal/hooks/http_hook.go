@@ -17,6 +17,9 @@ type HttpHook struct {
 func (l *HttpHook) Run(path string) error {
 	url := templateString(path, l.Url)
 	body := strings.NewReader(templateString(path, l.Body))
+
+	fmt.Printf("%s Request to: %q\n", l.Method, url)
+
 	request, err := http.NewRequest(l.Method, url, body)
 	if err != nil {
 		return err
@@ -34,9 +37,8 @@ func (l *HttpHook) Run(path string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Printf("Response (status code: %d) received\n", resp.StatusCode)
 	bodyString := string(bodyBytes)
-	fmt.Printf("%s Request to: %q\n", l.Method, url)
-	fmt.Printf("Response (status code: %d) to: %s %q\n", resp.StatusCode, l.Method, url)
 	if len(bodyString) > 0 {
 		fmt.Println("Body:")
 		fmt.Println(bodyString)
