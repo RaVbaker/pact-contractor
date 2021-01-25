@@ -81,7 +81,7 @@ func (h *Hook) CanRun(path string, ctx speccontext.GitContext, partsCtx parts.Co
 
 func envInclude(definition string) (matched bool) {
 	for _, envLine := range os.Environ() {
-		matched = matched || envLine == definition
+		matched = matched || compareMatch(definition, envLine)
 	}
 	return
 }

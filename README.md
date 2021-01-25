@@ -65,6 +65,9 @@ hooks:
   spec:
      command: echo "foo {path} OK"
 - type: http
+  match_context:
+     branch: main
+     origin: /^travis Build/
   spec:
      method: POST
      url: https://httpbin.org/post
@@ -75,9 +78,11 @@ hooks:
         content-type: application/json
 - type: aws_lambda
   require_env:
-  - USER=ravbaker
+  - TERM=xterm-256color
+  - /USER=(ravbaker|root)/
   spec:
-     function_name: "${USER}-lambda-run"
+     assume_role: "arn:aws:iam::123456789012:role/LambdaRunner"
+     function_name: "my-${USER}-lambda"
      region: "us-east-1"
      payload: "{}"
 ```
