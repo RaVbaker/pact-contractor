@@ -45,10 +45,10 @@ func Run(cmdToRun, pathsArg, s3VersionID, gitBranchName string, cmd, pullCmd, su
 	runCmd := exec.Command("bash", "-c", cmdToRun)
 	runCmd.Stdout = os.Stdout
 	runCmd.Stderr = os.Stderr
-	err = runCmd.Run()
+	runErr := runCmd.Run()
 
 	verificationStatus := "success"
-	if err != nil {
+	if runErr != nil {
 		verificationStatus = "failure"
 		log.Printf("Command error: %v", err)
 	}
@@ -60,5 +60,9 @@ func Run(cmdToRun, pathsArg, s3VersionID, gitBranchName string, cmd, pullCmd, su
 
 	err = submitCmd.RunE(cmd, []string{path, verificationStatus})
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	return runErr
 }
