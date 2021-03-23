@@ -42,7 +42,7 @@ func Run(cmdToRun, pathsArg, s3VersionID, gitBranchName string, cmd, pullCmd, su
 	cmdToRun = strings.ReplaceAll(cmdToRun, pathPattern, filename)
 
 	fmt.Printf("Executing command: `%s`\n\n", cmdToRun)
-	runCmd := exec.Command("bash", "-c", cmdToRun)
+	runCmd := exec.Command("sh", "-c", cmdToRun)
 	runCmd.Stdout = os.Stdout
 	runCmd.Stderr = os.Stderr
 	runErr := runCmd.Run()
