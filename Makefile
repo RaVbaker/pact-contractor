@@ -11,9 +11,14 @@ run:
 
 ## release: Releases new version of the binary and submits to GitHub. Remember to have the GITHUB_TOKEN env var present. Provide VERSION to set the released version. E.g. make release VERSION=v0.1.1
 release:
-	git tag -a $(VERSION)
-	git push origin $(VERSION)
+	git tag -fa $(VERSION)
+	git push -f origin $(VERSION)
 	goreleaser --rm-dist
+
+## revert-tag: Removes tag from local and origin to reissue release again
+revert-tag:
+
+
 
 .PHONY: help
 all: help
