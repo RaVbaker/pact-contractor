@@ -46,7 +46,10 @@ func Upload(bucket, region, filesPath string, partContext parts.Context, ctx spe
 			println(err.Error())
 			return
 		}
-		hooks.Runner(path, filename, ctx, partContext)
+		err = hooks.Runner(path, filename, ctx, partContext)
+		if err != nil {
+			println("hook error", err.Error())
+		}
 	}
 	return
 }
