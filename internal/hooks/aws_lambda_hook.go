@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/lambda"
+	"github.com/spf13/viper"
 )
 
 type AWSLambdaHook struct {
@@ -30,6 +31,15 @@ func (l *AWSLambdaHook) Run(path string) error {
 
 	config := &aws.Config{Region: optionalAWSString(region)}
 	sess := session.Must(session.NewSession(config))
+
+	pactAssumeRolArn := viper.GetString("aws_assume_role_arn")
+
+	if len(pactAssumeRolArn) > 0 {
+		log.Printf("AWS Client with Assumed Role from Config: %q", pactAssumeRolArn)
+		credentials := stscreds.NewCredentials(sess, pactAssumeRolArn)
+		config = config.WithCredentials(credentials)
+		sess = session.Must(session.NewSession(config))
+	}
 
 	assumeRole := templateString(path, l.AssumeRole)
 	if len(assumeRole) > 0 {
