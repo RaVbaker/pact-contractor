@@ -50,7 +50,7 @@ func Run(cmdToRun, pathsArg, s3VersionID, gitBranchName string, cmd, pullCmd, su
 	verificationStatus := "success"
 	if runErr != nil {
 		verificationStatus = "failure"
-		log.Printf("Command error: %v", err)
+		log.Printf("Command error: %v", runErr)
 	}
 
 	err = afero.Afero{Fs: fs}.Remove(filename)
