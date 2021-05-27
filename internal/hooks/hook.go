@@ -118,5 +118,7 @@ func (h *Hook) Definition() Spec {
 
 func templateString(path, template string) string {
 	template = strings.ReplaceAll(template, "{path}", path)
-	return os.ExpandEnv(template)
+	template = strings.ReplaceAll(template, "$$", "$&&")
+	template = os.ExpandEnv(template)
+	return strings.ReplaceAll(template, "$&&", "$")
 }

@@ -84,7 +84,7 @@ hooks:
      assume_role: "arn:aws:iam::123456789012:role/LambdaRunner"
      function_name: "my-${USER}-lambda"
      region: "us-east-1"
-     payload: "{}"
+     payload: "{\"some\": \"$$ will be dollar sign while $@ or ${PATH} will get replaced from the runtime\"}"
 ```
 
 ## Makefile
